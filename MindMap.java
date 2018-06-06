@@ -10,13 +10,14 @@ class Window extends JFrame {
 		setTitle("마인드맵");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //닫으면 종료
 		myPane = getContentPane();
-		makeMenu(); //메뉴바
-		makeTool(); // 툴바
-		makePane(); // Text Editor, MindMap, Attribute 페인
+		makeWindow();
 		setSize(1400, 800);
 		setVisible(true);
 	}
-	private void makeMenu() {
+	
+	private void makeWindow() {
+		
+		//메뉴
 		JMenuBar menu = new JMenuBar();
 		JButton menuNewFile = new JButton("새로 만들기");
 		JButton menuOpen = new JButton("열기");
@@ -33,8 +34,9 @@ class Window extends JFrame {
 		menu.add(menuChange);
 		menu.add(menuClose);
 		setJMenuBar(menu);
-	}
-	private void makeTool() {
+	
+		
+		//툴바
 		JToolBar tool = new JToolBar("TOOL BAR");
 		tool.setFloatable(true);
 		myPane.add(tool, BorderLayout.NORTH);
@@ -52,19 +54,25 @@ class Window extends JFrame {
 		tool.add(toolApply);
 		tool.add(toolChange);
 		tool.add(toolClose);
-	}
-	private void makePane() {
+
+		
+		
+		//페인
 		JSplitPane BasePane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
 		JSplitPane BasePane2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
+		
 		JPanel LeftPane = new JPanel(); //Text Editor Pane이 들어갈 곳
 		JPanel CenterPane = new JPanel(); //MindMap Pane이 들어갈 곳
 		JPanel RightPane = new JPanel(); //Attribute Pane이 들어갈 곳
 		LeftPane.setLayout(new BorderLayout());
 		CenterPane.setLayout(new BorderLayout());
 		RightPane.setLayout(new BorderLayout());
+		
 		JScrollPane TextPane = new JScrollPane(new JTextArea()); //실제로 글씨 쓰는 곳
-		JScrollPane MapPane = new JScrollPane(new JPanel()); //마인드맵이 출력되는 곳
+		JPanel MapPanel = new JPanel();
+		JScrollPane MapPane = new JScrollPane(MapPanel); //마인드맵이 출력되는 곳
 		JPanel Attribute = new JPanel(); //노드의 정보가 출력되는 곳
+		
 		Attribute.setLayout(new GridLayout(6, 2));
 		JScrollPane AttributePane = new JScrollPane(Attribute);
 		myPane.add(BasePane);
@@ -73,6 +81,7 @@ class Window extends JFrame {
 		BasePane.setRightComponent(BasePane2);
 		BasePane.setDividerLocation(300);
 		BasePane.setDividerSize(3);
+		
 		LeftPane.add(new JLabel("Text Editor Pane", SwingConstants.CENTER), BorderLayout.NORTH);
 		LeftPane.add(TextPane, BorderLayout.CENTER);
 		LeftPane.add(new JButton("적용"), BorderLayout.SOUTH);
@@ -104,6 +113,29 @@ class Window extends JFrame {
 		JTextField colorBox = new JTextField();
 		Attribute.add(colorBox);
 		RightPane.add(new JButton("변경"), BorderLayout.SOUTH);
+		
+		JLabel test = new JLabel("tset");
+		test.addMouseMotionListener(new MouseMotionListener() {
+
+			@Override
+			public void mouseDragged(MouseEvent e) {
+				test.setLocation(test.getX()+e.getX(),test.getY()+ e.getY());
+				
+			}
+
+			@Override
+			public void mouseMoved(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
+		
+		MapPanel.add(test);
+		
+		
+		
+		
 	}
 }
 

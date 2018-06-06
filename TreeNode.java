@@ -21,6 +21,14 @@ class Node<T>{
 	public Node<T> getNext(int index) {
 		return next.get(index);
 	}
+	
+	public void deleteNext(int index) {
+		next.remove(index);
+	}
+	
+	public int getNextNumber(){
+		return next.size();
+	}
 }
 
 class JavaTree<T>{
@@ -28,6 +36,9 @@ class JavaTree<T>{
 	
 	public void insertNode(Node<T> topNode,Node<T> inputNode) {
 		topNode.setNext(inputNode);
+	}
+	public void deleteNode(Node<T> topNode,Node<T> inputNode) {
+		
 	}
 	
 }

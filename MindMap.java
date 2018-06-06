@@ -2,6 +2,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
+import javax.swing.border.*;
 
 class Window extends JFrame {
 	private Container myPane; //프레임
@@ -35,6 +36,10 @@ class Window extends JFrame {
 	JTextField hBox;
 	JTextField colorBox;
 	JButton change;
+	
+	Font paneFont = new Font("Arial", Font.PLAIN, 30); //Attribute Pane에 적용된 폰트
+	Font labelFont = new Font("Arial", Font.BOLD, 30); //Pane 이름에 적용된 폰트
+	Font nodeFont = new Font("굴림", Font.PLAIN, 20); //node에 적용될 폰트
 	
 	JavaTree<JLabel> storage;	//node저장소
 	
@@ -94,9 +99,6 @@ class Window extends JFrame {
 		//페인
 		JSplitPane BasePane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
 		JSplitPane BasePane2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
-		Font paneFont = new Font("Arial", Font.PLAIN, 30); //Attribute Pane에 적용된 폰트
-		Font labelFont = new Font("Arial", Font.BOLD, 30); //Pane 이름에 적용된 폰트
-		Font nodeFont = new Font("굴림", Font.PLAIN, 20); //node에 적용될 폰트
 		
 		JPanel LeftPane = new JPanel(); //Text Editor Pane이 들어갈 곳
 		JPanel CenterPane = new JPanel(); //MindMap Pane이 들어갈 곳
@@ -173,21 +175,16 @@ class Window extends JFrame {
 		change = new JButton("변경");
 		RightPane.add(change, BorderLayout.SOUTH);
 		
-		
-		
 
-	
 		apply.addActionListener(new ApplyListener());
-		
-	
-		
-		
 	}
+	
 	class ApplyListener implements ActionListener{	//적용 리스너
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			String text = TextArea.getText();
+			text = text + "\n\n";
 			insertNode(text,storage.rootNode,0);
 			MapPanel.updateUI();
 		}
@@ -209,6 +206,13 @@ class Window extends JFrame {
 					stringData = stringData.substring(stringData.indexOf('\n')+1);
 					preNode = new Node<>();
 					preNode.setData(preLabel);
+					preLabel.setOpaque(true);
+	
+					preLabel.setBorder(LineBorder.createBlackLineBorder());
+					preLabel.setPreferredSize(new Dimension(100, 50));
+					preLabel.setBackground(Color.WHITE);
+					preLabel.setFont(nodeFont);;
+					preLabel.setHorizontalAlignment(SwingConstants.CENTER);
 					preLabel.addMouseMotionListener(new NodeDrag());
 					MapPanel.add(preLabel);
 					storage.insertNode(rootNode, preNode);

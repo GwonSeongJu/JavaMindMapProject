@@ -16,7 +16,7 @@ class Window extends JFrame {
 	}
 	
 	private void makeWindow() {
-		
+		JavaTree<JLabel> storage = new JavaTree();
 		//메뉴
 		JMenuBar menu = new JMenuBar();
 		JButton menuNewFile = new JButton("새로 만들기");
@@ -68,7 +68,8 @@ class Window extends JFrame {
 		CenterPane.setLayout(new BorderLayout());
 		RightPane.setLayout(new BorderLayout());
 		
-		JScrollPane TextPane = new JScrollPane(new JTextArea()); //실제로 글씨 쓰는 곳
+		JTextArea TextArea = new JTextArea();
+		JScrollPane TextPane = new JScrollPane(TextArea); //실제로 글씨 쓰는 곳
 		JPanel MapPanel = new JPanel();
 		JScrollPane MapPane = new JScrollPane(MapPanel); //마인드맵이 출력되는 곳
 		JPanel Attribute = new JPanel(); //노드의 정보가 출력되는 곳
@@ -142,5 +143,6 @@ class Window extends JFrame {
 public class MindMap {
 	public static void main(String[] args) {
 		new Window();
+		
 	}
 }

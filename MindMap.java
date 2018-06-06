@@ -17,6 +17,8 @@ class Window extends JFrame {
 	
 	private void makeWindow() {
 		JavaTree<JLabel> storage = new JavaTree();
+		
+		
 		//메뉴
 		JMenuBar menu = new JMenuBar();
 		JButton menuNewFile = new JButton("새로 만들기");
@@ -60,6 +62,9 @@ class Window extends JFrame {
 		//페인
 		JSplitPane BasePane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
 		JSplitPane BasePane2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
+		Font paneFont = new Font("Arial", Font.PLAIN, 30); //Attribute Pane에 적용된 폰트
+		Font labelFont = new Font("Arial", Font.BOLD, 30); //Pane 이름에 적용된 폰트
+		Font nodeFont = new Font("Arial", Font.PLAIN, 20); //node에 적용될 폰트
 		
 		JPanel LeftPane = new JPanel(); //Text Editor Pane이 들어갈 곳
 		JPanel CenterPane = new JPanel(); //MindMap Pane이 들어갈 곳
@@ -83,37 +88,57 @@ class Window extends JFrame {
 		BasePane.setDividerLocation(300);
 		BasePane.setDividerSize(3);
 		
-		LeftPane.add(new JLabel("Text Editor Pane", SwingConstants.CENTER), BorderLayout.NORTH);
+		JLabel textEditorLabel = new JLabel("Text Editor Pane", SwingConstants.CENTER);
+		textEditorLabel.setFont(labelFont);
+		LeftPane.add(textEditorLabel, BorderLayout.NORTH);
 		LeftPane.add(TextPane, BorderLayout.CENTER);
-		LeftPane.add(new JButton("적용"), BorderLayout.SOUTH);
+		JButton apply = new JButton("적용");
+		LeftPane.add(apply, BorderLayout.SOUTH);
 
 		BasePane2.setLeftComponent(CenterPane); // MindMap, Attribute Pane 배치
 		BasePane2.setRightComponent(RightPane);
 		BasePane2.setDividerLocation(700);
 		BasePane2.setDividerSize(3);
-		CenterPane.add(new JLabel("Mine Map Pane", SwingConstants.CENTER), BorderLayout.NORTH); //MindMap Pane 제작
+		JLabel mindMapLabel = new JLabel("Mine Map Pane", SwingConstants.CENTER); //MindMap Pane 제작
+		mindMapLabel.setFont(labelFont);
+		CenterPane.add(mindMapLabel, BorderLayout.NORTH);
 		CenterPane.add(MapPane, BorderLayout.CENTER);
-		RightPane.add(new JLabel("Attribute Pane", SwingConstants.CENTER), BorderLayout.NORTH); //Attribute Pane 제작
+		JLabel attributeLabel = new JLabel("Attribute Pane", SwingConstants.CENTER);  //Attribute Pane 제작
+		attributeLabel.setFont(labelFont);
+		RightPane.add(attributeLabel, BorderLayout.NORTH);
 		RightPane.add(AttributePane, BorderLayout.CENTER);
-		Attribute.add(new JLabel("TEXT:	")); 
+		JLabel textLabel = new JLabel("TEXT:	"); //AttribuePane 조립
+		textLabel.setFont(paneFont);
+		Attribute.add(textLabel);
 		JTextField textBox = new JTextField();
 		Attribute.add(textBox);
-		Attribute.add(new JLabel("X:	"));
+		JLabel xLabel = new JLabel("X:	");
+		xLabel.setFont(paneFont);
+		Attribute.add(xLabel);
 		JTextField xBox = new JTextField();
 		Attribute.add(xBox);
-		Attribute.add(new JLabel("Y:	"));
+		JLabel yLabel = new JLabel("Y:	");
+		yLabel.setFont(paneFont);
+		Attribute.add(yLabel);
 		JTextField yBox = new JTextField();
 		Attribute.add(yBox);
-		Attribute.add(new JLabel("W:	"));
+		JLabel wLabel = new JLabel("W:	");
+		wLabel.setFont(paneFont);
+		Attribute.add(wLabel);
 		JTextField wBox = new JTextField();
 		Attribute.add(wBox);
-		Attribute.add(new JLabel("H:	"));
+		JLabel hLabel = new JLabel("H:	");
+		hLabel.setFont(paneFont);
+		Attribute.add(hLabel);
 		JTextField hBox = new JTextField();
 		Attribute.add(hBox);
-		Attribute.add(new JLabel("Color:"));
+		JLabel colorLabel = new JLabel("Color:");
+		colorLabel.setFont(paneFont);
+		Attribute.add(colorLabel);
 		JTextField colorBox = new JTextField();
 		Attribute.add(colorBox);
-		RightPane.add(new JButton("변경"), BorderLayout.SOUTH);
+		JButton change = new JButton("변경");
+		RightPane.add(change, BorderLayout.SOUTH);
 		
 		JLabel test = new JLabel("tset");
 		test.addMouseMotionListener(new MouseMotionListener() {

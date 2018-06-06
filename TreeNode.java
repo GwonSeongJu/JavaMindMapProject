@@ -26,6 +26,10 @@ class Node<T>{
 		next.remove(index);
 	}
 	
+	public void deleteNode(Node<T> node){
+		next.remove(node);
+	}
+	
 	public int getNextNumber(){
 		return next.size();
 	}
@@ -38,7 +42,7 @@ class JavaTree<T>{
 		topNode.setNext(inputNode);
 	}
 	public void deleteNode(Node<T> topNode,Node<T> inputNode) {
-		
+		topNode.deleteNode(inputNode);
 	}
 	
 }

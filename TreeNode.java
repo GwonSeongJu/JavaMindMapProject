@@ -38,8 +38,17 @@ class Node<T>{
 class JavaTree<T>{
 	Node<T> rootNode;
 	
+	JavaTree() {
+		rootNode = new Node<T>();
+	}
 	public void insertNode(Node<T> topNode,Node<T> inputNode) {
 		topNode.setNext(inputNode);
+	}
+	public void insertNode(Node<T> topNode,T inputData) {
+		Node<T> tmp;
+		tmp = new Node<T>();
+		tmp.setData(inputData);
+		topNode.setNext(tmp);
 	}
 	public void deleteNode(Node<T> topNode,Node<T> inputNode) {
 		topNode.deleteNode(inputNode);

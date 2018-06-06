@@ -36,7 +36,10 @@ class Window extends JFrame {
 	JTextField colorBox;
 	JButton change;
 	
+	JavaTree<JLabel> storage;	//node저장소
+	
 	public Window() {
+		storage = new JavaTree();
 		setTitle("마인드맵");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //닫으면 종료
 		myPane = getContentPane();
@@ -46,7 +49,7 @@ class Window extends JFrame {
 	}
 	
 	private void makeWindow() {
-		JavaTree<JLabel> storage = new JavaTree();
+		
 		
 		//메뉴
 		JMenuBar menu = new JMenuBar();
@@ -171,48 +174,71 @@ class Window extends JFrame {
 		RightPane.add(change, BorderLayout.SOUTH);
 		
 		
-		JLabel test = new JLabel("tset");
 		
-		class NodeDrag implements MouseMotionListener{
-			@Override
-			public void mouseDragged(MouseEvent e) {
-				test.setLocation(test.getX()+e.getX(),test.getY()+ e.getY());
-				
-			}
 
-			@Override
-			public void mouseMoved(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-		};
+	
+		apply.addActionListener(new ApplyListener());
 		
-		test.addMouseMotionListener(new NodeDrag());
-
-			
-		
-		apply.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				String[] nodes = TextArea.getText().split("\n");
-				for(int i=0;i<nodes.length;i++) {
-					JLabel tmp = new JLabel(nodes[i]);
-					tmp.addMouseMotionListener(new NodeDrag());
-					MapPanel.add(tmp);
-			
-				}
-			}
-			
-		});
-		
-		MapPanel.add(test);
-		
-		
+	
 		
 		
 	}
+	class ApplyListener implements ActionListener{	//적용 리스너
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			String text = TextArea.getText();
+			insertNode(text,storage.rootNode,0);
+			MapPanel.updateUI();
+		}
+		
+		private String insertNode(String stringData, Node<JLabel> rootNode, int depth) {
+			Node<JLabel> preNode = null;
+			
+			while(true) {
+				int tapCount = 0;
+				if(stringData.charAt(0)=='\n') {
+					return stringData;
+				}
+				for(int i=0;stringData.charAt(i)=='\t';i++) {
+					tapCount++;
+				}
+				if(tapCount==depth) {
+					stringData = stringData.substring(tapCount);
+					JLabel preLabel = new JLabel(stringData.substring(0, stringData.indexOf('\n')));
+					stringData = stringData.substring(stringData.indexOf('\n')+1);
+					preNode = new Node<>();
+					preNode.setData(preLabel);
+					preLabel.addMouseMotionListener(new NodeDrag());
+					MapPanel.add(preLabel);
+					storage.insertNode(rootNode, preNode);
+				}
+				if(tapCount>depth) {
+					stringData = insertNode(stringData,preNode,depth+1);
+				}
+				if(tapCount<depth){
+					return stringData;
+				}
+			}
+		}
+		
+	}
+	
+	class NodeDrag implements MouseMotionListener{	//노드 마우스 드래그 리스너
+		@Override
+		public void mouseDragged(MouseEvent e) {
+			e.getComponent().setLocation(e.getComponent().getX()+e.getX(),e.getComponent().getY()+ e.getY());
+			
+		}
+
+		@Override
+		public void mouseMoved(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+	};
+	
 }
 
 public class MindMap {

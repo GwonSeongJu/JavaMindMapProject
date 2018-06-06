@@ -140,9 +140,10 @@ class Window extends JFrame {
 		JButton change = new JButton("º¯°æ");
 		RightPane.add(change, BorderLayout.SOUTH);
 		
+		
 		JLabel test = new JLabel("tset");
-		test.addMouseMotionListener(new MouseMotionListener() {
-
+		
+		class NodeDrag implements MouseMotionListener{
 			@Override
 			public void mouseDragged(MouseEvent e) {
 				test.setLocation(test.getX()+e.getX(),test.getY()+ e.getY());
@@ -153,6 +154,25 @@ class Window extends JFrame {
 			public void mouseMoved(MouseEvent e) {
 				// TODO Auto-generated method stub
 				
+			}
+			
+		};
+		
+		test.addMouseMotionListener(new NodeDrag());
+
+			
+		
+		apply.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				String[] nodes = TextArea.getText().split("\n");
+				for(int i=0;i<nodes.length;i++) {
+					JLabel tmp = new JLabel(nodes[i]);
+					tmp.addMouseMotionListener(new NodeDrag());
+					MapPanel.add(tmp);
+			
+				}
 			}
 			
 		});

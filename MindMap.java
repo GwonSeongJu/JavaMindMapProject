@@ -58,6 +58,7 @@ class Window extends JFrame {
 		
 		//메뉴
 		JMenuBar menu = new JMenuBar();
+		setJMenuBar(menu);
 		menuNewFile = new JButton("새로 만들기");
 		menuOpen = new JButton("열기");
 		menuSave = new JButton("저장");
@@ -70,9 +71,11 @@ class Window extends JFrame {
 		menu.add(menuSave);
 		menu.add(menuSaveName);
 		menu.add(menuApply);
+		menuApply.addActionListener(new ApplyListener());
 		menu.add(menuChange);
 		menu.add(menuClose);
-		setJMenuBar(menu);
+		menuClose.addActionListener(new CloseListener());
+		
 	
 		
 		//툴바 
@@ -84,6 +87,7 @@ class Window extends JFrame {
 		toolSave = new JButton("저장");
 		toolSaveName = new JButton("다른 이름으로 저장");
 		toolApply = new JButton("적용");
+		toolApply.addActionListener(new ApplyListener());
 		toolChange = new JButton("변경");
 		toolClose = new JButton("닫기");
 		tool.add(toolNewFile);
@@ -93,6 +97,7 @@ class Window extends JFrame {
 		tool.add(toolApply);
 		tool.add(toolChange);
 		tool.add(toolClose);
+		toolClose.addActionListener(new CloseListener());
 
 		
 		
@@ -177,6 +182,14 @@ class Window extends JFrame {
 		
 
 		apply.addActionListener(new ApplyListener());
+	}
+	
+	class CloseListener implements ActionListener{	//닫기 리스너
+		
+		@Override
+		public void actionPerformed(ActionEvent arg) {
+			System.exit(0);
+		}
 	}
 	
 	class ApplyListener implements ActionListener{	//적용 리스너

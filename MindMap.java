@@ -43,6 +43,8 @@ class Window extends JFrame {
 	
 	JavaTree<JLabel> storage;	//node저장소
 	
+	JLabel pointW;
+	
 	public Window() {
 		storage = new JavaTree();
 		setTitle("마인드맵");
@@ -180,8 +182,11 @@ class Window extends JFrame {
 		change = new JButton("변경");
 		RightPane.add(change, BorderLayout.SOUTH);
 		
-
+		pointW = new JLabel();
+		
 		apply.addActionListener(new ApplyListener());
+		
+		MapPanel.add(pointW);
 	}
 	
 	class CloseListener implements ActionListener{	//닫기 리스너
@@ -200,6 +205,7 @@ class Window extends JFrame {
 			text = text + "\n\n";
 			insertNode(text,storage.rootNode,0);
 			MapPanel.updateUI();
+			DrawNodeLine(MapPanel.getGraphics(),storage.rootNode.getNext(0));
 		}
 		
 		private String insertNode(String stringData, Node<JLabel> rootNode, int depth) {
@@ -227,6 +233,7 @@ class Window extends JFrame {
 					preLabel.setFont(nodeFont);;
 					preLabel.setHorizontalAlignment(SwingConstants.CENTER);
 					preLabel.addMouseMotionListener(new NodeDrag());
+					preLabel.addMouseListener(new NodeDrag());
 					MapPanel.add(preLabel);
 					storage.insertNode(rootNode, preNode);
 				}
@@ -241,20 +248,63 @@ class Window extends JFrame {
 		
 	}
 	
-	class NodeDrag implements MouseMotionListener{	//노드 마우스 드래그 리스너
+	class NodeDrag implements MouseMotionListener, MouseListener{	//노드 마우스 드래그 리스너
 		@Override
 		public void mouseDragged(MouseEvent e) {
-			e.getComponent().setLocation(e.getComponent().getX()+e.getX(),e.getComponent().getY()+ e.getY());
+			
+			int movedPointX = e.getComponent().getX() + e.getX();
+			int movedPointY = e.getComponent().getY()+ e.getY();;
+			e.getComponent().setLocation(movedPointX,movedPointY);	
+			
 			
 		}
 
 		@Override
 		public void mouseMoved(MouseEvent e) {
+			
+		}
+
+		@Override
+		public void mouseClicked(MouseEvent arg0) {
 			// TODO Auto-generated method stub
 			
 		}
+
+		@Override
+		public void mouseEntered(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+			
+			
+		}
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			DrawNodeLine(MapPanel.getGraphics(),storage.rootNode.getNext(0));
+		}
 		
 	};
+	
+	void DrawNodeLine(Graphics g,Node<JLabel> root) {
+		if(root.getNextNumber()==0)
+			return;
+		g.setColor(Color.BLACK);
+		for(int i=0;i<root.getNextNumber();i++) {
+			DrawNodeLine(g,root.getNext(i));
+			
+			g.drawLine(root.getData().getX(), root.getData().getY(), root.getNext(i).getData().getX(), root.getNext(i).getData().getY());
+		}
+	}
 	
 }
 

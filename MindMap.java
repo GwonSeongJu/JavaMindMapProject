@@ -37,11 +37,13 @@ class Window extends JFrame {
 	JTextField colorBox;
 	JButton change;
 	
-	Font paneFont = new Font("Arial", Font.PLAIN, 30); //Attribute Pane에 적용된 폰트
+	Font paneFont = new Font("굴림", Font.PLAIN, 40); //Attribute Pane에 적용된 폰트
 	Font labelFont = new Font("Arial", Font.BOLD, 30); //Pane 이름에 적용된 폰트
 	Font nodeFont = new Font("굴림", Font.PLAIN, 20); //node에 적용될 폰트
 	
 	JavaTree<JLabel> storage;	//node저장소
+	
+	JLabel labelPointer = null;
 	
 	JLabel pointW;
 	
@@ -73,9 +75,10 @@ class Window extends JFrame {
 		menu.add(menuSave);
 		menu.add(menuSaveName);
 		menu.add(menuApply);
-		menuApply.addActionListener(new ApplyListener());
 		menu.add(menuChange);
 		menu.add(menuClose);
+		menuApply.addActionListener(new ApplyListener());
+		menuChange.addActionListener(new ChangeListener());
 		menuClose.addActionListener(new CloseListener());
 		
 	
@@ -88,8 +91,7 @@ class Window extends JFrame {
 		toolOpen = new JButton("열기");
 		toolSave = new JButton("저장");
 		toolSaveName = new JButton("다른 이름으로 저장");
-		toolApply = new JButton("적용");
-		toolApply.addActionListener(new ApplyListener());
+		toolApply = new JButton("적용");	
 		toolChange = new JButton("변경");
 		toolClose = new JButton("닫기");
 		tool.add(toolNewFile);
@@ -99,6 +101,8 @@ class Window extends JFrame {
 		tool.add(toolApply);
 		tool.add(toolChange);
 		tool.add(toolClose);
+		toolApply.addActionListener(new ApplyListener());
+		toolChange.addActionListener(new ChangeListener());
 		toolClose.addActionListener(new CloseListener());
 
 		
@@ -153,33 +157,41 @@ class Window extends JFrame {
 		textLabel.setFont(paneFont);
 		Attribute.add(textLabel);
 		textBox = new JTextField();
+		textBox.setFont(nodeFont);
 		Attribute.add(textBox);
 		JLabel xLabel = new JLabel("X:	");
 		xLabel.setFont(paneFont);
 		Attribute.add(xLabel);
 		xBox = new JTextField();
+		xBox.setFont(paneFont);
 		Attribute.add(xBox);
 		JLabel yLabel = new JLabel("Y:	");
 		yLabel.setFont(paneFont);
 		Attribute.add(yLabel);
 		yBox = new JTextField();
+		yBox.setFont(paneFont);
 		Attribute.add(yBox);
 		JLabel wLabel = new JLabel("W:	");
 		wLabel.setFont(paneFont);
 		Attribute.add(wLabel);
 		wBox = new JTextField();
+		wBox.setFont(paneFont);
 		Attribute.add(wBox);
 		JLabel hLabel = new JLabel("H:	");
 		hLabel.setFont(paneFont);
 		Attribute.add(hLabel);
 		hBox = new JTextField();
+		hBox.setFont(paneFont);
 		Attribute.add(hBox);
 		JLabel colorLabel = new JLabel("Color:");
 		colorLabel.setFont(paneFont);
 		Attribute.add(colorLabel);
 		colorBox = new JTextField();
+		colorBox.addMouseListener(new ColorListener());
+		colorBox.setFont(paneFont);
 		Attribute.add(colorBox);
 		change = new JButton("변경");
+		change.addActionListener(new ChangeListener());
 		RightPane.add(change, BorderLayout.SOUTH);
 		
 		pointW = new JLabel();
@@ -194,6 +206,50 @@ class Window extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent arg) {
 			System.exit(0);
+		}
+	}
+	
+	class ColorListener extends MouseAdapter	{	//색깔 선택 리스너
+		
+		@Override
+		public void mouseClicked(MouseEvent arg) {
+			JTextField t = (JTextField)arg.getSource();
+			Color selectedColor = JColorChooser.showDialog(null, "Color", Color.WHITE);
+			if(selectedColor != null) {
+				String color = String.format("%02X" + "%02X" + "%02X", selectedColor.getRed(), selectedColor.getBlue(), selectedColor.getGreen());
+				t.setText(color);
+				t.setBackground(selectedColor);
+			}
+		}
+	}
+	
+	class NodeClickListener extends MouseAdapter{	//노드 클릭해서 정보 출력하는 리스너
+		
+		@Override
+		public void mouseClicked(MouseEvent arg) {
+			JLabel l = (JLabel)arg.getSource();
+			labelPointer = l;
+			textBox.setText(l.getText());
+			xBox.setText("" + l.getX());
+			yBox.setText("" + l.getY());
+			hBox.setText("" + l.getHeight());
+			wBox.setText("" + l.getWidth());
+			String color = String.format("%02X" + "%02X" + "%02X", l.getBackground().getRed(), l.getBackground().getBlue(), l.getBackground().getGreen());
+			colorBox.setText(color);
+		}
+	}
+	
+	class ChangeListener implements ActionListener{	//변경 리스너
+		
+		@Override
+		public void actionPerformed(ActionEvent arg) {
+			JLabel cl = labelPointer;
+			cl.setLocation(Integer.parseInt(xBox.getText()), Integer.parseInt(yBox.getText()));
+			cl.setText(textBox.getText());
+			cl.setAlignmentX(Integer.parseInt(xBox.getText()));
+			cl.setAlignmentY(Integer.parseInt(yBox.getText()));
+			cl.setSize(new Dimension(Integer.parseInt(wBox.getText()), Integer.parseInt(hBox.getText())));
+			cl.setBackground(colorBox.getBackground());
 		}
 	}
 	
@@ -232,6 +288,7 @@ class Window extends JFrame {
 					preLabel.setBackground(Color.WHITE);
 					preLabel.setFont(nodeFont);;
 					preLabel.setHorizontalAlignment(SwingConstants.CENTER);
+					preLabel.addMouseListener(new NodeClickListener());
 					preLabel.addMouseMotionListener(new NodeDrag());
 					preLabel.addMouseListener(new NodeDrag());
 					MapPanel.add(preLabel);

@@ -251,11 +251,9 @@ class Window extends JFrame {
 	class NodeDrag implements MouseMotionListener, MouseListener{	//노드 마우스 드래그 리스너
 		@Override
 		public void mouseDragged(MouseEvent e) {
-			
 			int movedPointX = e.getComponent().getX() + e.getX();
 			int movedPointY = e.getComponent().getY()+ e.getY();;
-			e.getComponent().setLocation(movedPointX,movedPointY);	
-			
+			e.getComponent().setLocation(movedPointX,movedPointY);
 			
 		}
 
@@ -284,7 +282,7 @@ class Window extends JFrame {
 
 		@Override
 		public void mousePressed(MouseEvent e) {
-			// TODO Auto-generated method stub
+			MapPanel.repaint();
 			
 		}
 
@@ -301,8 +299,9 @@ class Window extends JFrame {
 		g.setColor(Color.BLACK);
 		for(int i=0;i<root.getNextNumber();i++) {
 			DrawNodeLine(g,root.getNext(i));
-			
 			g.drawLine(root.getData().getX(), root.getData().getY(), root.getNext(i).getData().getX(), root.getNext(i).getData().getY());
+			root.getData().repaint();
+			root.getNext(i).getData().repaint();
 		}
 	}
 	

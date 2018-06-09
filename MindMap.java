@@ -119,6 +119,7 @@ class Window extends JFrame {
 		RightPane.setLayout(new BorderLayout());
 		
 		TextArea = new JTextArea(); //글씨 쓰는 곳
+		TextArea.setTabSize(4);
 		JScrollPane TextPane = new JScrollPane(TextArea);
 		TextArea.setFont(nodeFont);
 		MapPanel = new JPanel(); //마인드맵이 출력되는 곳
@@ -149,6 +150,7 @@ class Window extends JFrame {
 		mindMapLabel.setFont(labelFont);
 		CenterPane.add(mindMapLabel, BorderLayout.NORTH);
 		CenterPane.add(MapPane, BorderLayout.CENTER);
+		MapPanel.addMouseListener(new BackgroundClickListener());
 		JLabel attributeLabel = new JLabel("Attribute Pane", SwingConstants.CENTER);  //Attribute Pane 제작
 		attributeLabel.setFont(labelFont);
 		RightPane.add(attributeLabel, BorderLayout.NORTH);
@@ -213,29 +215,52 @@ class Window extends JFrame {
 		
 		@Override
 		public void mouseClicked(MouseEvent arg) {
-			JTextField t = (JTextField)arg.getSource();
-			Color selectedColor = JColorChooser.showDialog(null, "Color", Color.WHITE);
-			if(selectedColor != null) {
-				String color = String.format("%02X" + "%02X" + "%02X", selectedColor.getRed(), selectedColor.getBlue(), selectedColor.getGreen());
-				t.setText(color);
-				t.setBackground(selectedColor);
+			if(labelPointer != null) {
+				JTextField t = (JTextField)arg.getSource();
+				Color selectedColor = JColorChooser.showDialog(null, "Color", labelPointer.getBackground());
+				if(selectedColor != null) {
+					String color = String.format("%02X" + "%02X" + "%02X", selectedColor.getRed(), selectedColor.getBlue(), selectedColor.getGreen());
+					t.setText(color);
+					t.setBackground(selectedColor);
+				}
 			}
 		}
 	}
 	
-	class NodeClickListener extends MouseAdapter{	//노드 클릭해서 정보 출력하는 리스너
+	class BackgroundClickListener extends MouseAdapter{	//배경을 클릭해서 노드 비활성화하는 리스너
+		
+		@Override
+		public void mouseClicked(MouseEvent arg) {
+			if(labelPointer != null)
+				labelPointer.setBorder(LineBorder.createBlackLineBorder());
+			labelPointer = null;
+			textBox.setText("");
+			xBox.setText("");
+			yBox.setText("");
+			hBox.setText("");
+			wBox.setText("");
+			colorBox.setText("");
+			colorBox.setBackground(Color.WHITE);
+		}
+	}
+	
+	class NodeClickListener extends MouseAdapter{	//노드 클릭해서 활성화시키고 정보 출력하는 리스너
 		
 		@Override
 		public void mouseClicked(MouseEvent arg) {
 			JLabel l = (JLabel)arg.getSource();
+			if(labelPointer != null)
+				labelPointer.setBorder(LineBorder.createBlackLineBorder());
 			labelPointer = l;
+			l.setBorder(new LineBorder(Color.BLACK, 5));
 			textBox.setText(l.getText());
-			xBox.setText("" + l.getX());
-			yBox.setText("" + l.getY());
-			hBox.setText("" + l.getHeight());
-			wBox.setText("" + l.getWidth());
+			xBox.setText(String.valueOf(l.getX()));
+			yBox.setText(String.valueOf(l.getY()));
+			hBox.setText(String.valueOf(l.getHeight()));
+			wBox.setText(String.valueOf(l.getWidth()));
 			String color = String.format("%02X" + "%02X" + "%02X", l.getBackground().getRed(), l.getBackground().getBlue(), l.getBackground().getGreen());
 			colorBox.setText(color);
+			colorBox.setBackground(l.getBackground());
 		}
 	}
 	
@@ -243,13 +268,12 @@ class Window extends JFrame {
 		
 		@Override
 		public void actionPerformed(ActionEvent arg) {
-			JLabel cl = labelPointer;
-			cl.setLocation(Integer.parseInt(xBox.getText()), Integer.parseInt(yBox.getText()));
-			cl.setText(textBox.getText());
-			cl.setAlignmentX(Integer.parseInt(xBox.getText()));
-			cl.setAlignmentY(Integer.parseInt(yBox.getText()));
-			cl.setSize(new Dimension(Integer.parseInt(wBox.getText()), Integer.parseInt(hBox.getText())));
-			cl.setBackground(colorBox.getBackground());
+			if(labelPointer != null) {
+				labelPointer.setLocation(Integer.parseInt(xBox.getText()), Integer.parseInt(yBox.getText()));
+				labelPointer.setText(textBox.getText());
+				labelPointer.setBounds(Integer.parseInt(xBox.getText()), Integer.parseInt(yBox.getText()), Integer.parseInt(wBox.getText()), Integer.parseInt(hBox.getText()));
+				labelPointer.setBackground(colorBox.getBackground());
+			}
 		}
 	}
 	
@@ -302,7 +326,6 @@ class Window extends JFrame {
 				}
 			}
 		}
-		
 	}
 	
 	class NodeDrag implements MouseMotionListener, MouseListener{	//노드 마우스 드래그 리스너

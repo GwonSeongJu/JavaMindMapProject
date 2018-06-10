@@ -45,7 +45,8 @@ class Window extends JFrame {
 	JavaTree<JLabel> storage;	//node저장소
 	JLabel labelPointer = null; //클릭한 노드를 저장하는 포인터
 	JLabel pointW;
-	boolean drag;
+	
+	Point clickedPoint = new Point();
 	Point dragLocation = new Point();
 	
 	public Window() {
@@ -241,25 +242,7 @@ class Window extends JFrame {
 		}
 	}
 	
-	class NodeClickListener extends MouseAdapter{	//노드 클릭해서 활성화시키고 정보 출력하는 리스너
-		
-		@Override
-		public void mouseClicked(MouseEvent arg) {
-			updateInformation(arg);
-			
-		}
-		
-		@Override
-        public void mousePressed(MouseEvent e) {
-            drag = true;
-            dragLocation = e.getPoint();
-        }
 
-        @Override
-        public void mouseReleased(MouseEvent e) {
-            drag = false;
-        }
-	}
 	
 	void updateInformation(MouseEvent arg) {
 		JLabel l = (JLabel)arg.getSource();
@@ -323,13 +306,18 @@ class Window extends JFrame {
 					preNode.setData(preLabel);
 					preLabel.setOpaque(true);
 	
-					preLabel.setBounds(10, 10, 100, 50);
+					
+					if(depth==0) {
+						preLabel.setBounds(MapPanel.getWidth()/2, MapPanel.getHeight()/2, 100, 50);
+					}
+					else {
+						preLabel.setBounds(10,10,100,50);
+					}
 					preLabel.setBorder(LineBorder.createBlackLineBorder());
 					preLabel.setPreferredSize(new Dimension(100, 50));
 					preLabel.setBackground(Color.WHITE);
 					preLabel.setFont(nodeFont);;
 					preLabel.setHorizontalAlignment(SwingConstants.CENTER);
-					preLabel.addMouseListener(new NodeClickListener());
 					preLabel.addMouseMotionListener(new NodeDrag());
 					preLabel.addMouseListener(new NodeDrag());
 					MapPanel.add(preLabel);
@@ -347,22 +335,38 @@ class Window extends JFrame {
 	}
 	
 	class NodeDrag implements MouseMotionListener, MouseListener{	//노드 마우스 드래그 리스너
+
+		
+		
 		
 		 @Override
-	        public void mouseDragged(MouseEvent e) {
-	            if (drag && (labelPointer != null)) {
-	                if (dragLocation.getX()>(labelPointer.getWidth()-10) && dragLocation.getY()>(labelPointer.getHeight()-10)) {
-	                	updateInformation(e);
-	                    labelPointer. setSize((int)(labelPointer.getWidth()+(e.getPoint().getX()-dragLocation.getX())), (int)(labelPointer.getHeight()+(e.getPoint().getY()-dragLocation.getY())));
-	                    dragLocation = e.getPoint();
+	        public void mouseDragged(MouseEvent e) { 
+         	updateInformation(e);
+	                if (dragLocation.getX()>e.getComponent().getWidth()-10 || dragLocation.getY() > e.getComponent().getHeight() -10) {
+	                	//dragLocation.getX()>(labelPointer.getWidth()-10) && dragLocation.getY()>(labelPointer.getHeight()-10)
+	                	System.out.println("크기");
+	                	int width = (int) (e.getComponent().getWidth() + (e.getX() - dragLocation.getX()));
+	                	int height =(int) (e.getComponent().getHeight() + (e.getY() - dragLocation.getY()));
+	                	e.getComponent().setSize(width,height);
+	                	dragLocation = e.getPoint();
 	                }
-	                else {
-	                	updateInformation(e);
-	        			int movedPointX = e.getComponent().getX() + e.getX();
-	        			int movedPointY = e.getComponent().getY() + e.getY();
+	                else if(dragLocation.getX() < 10 || dragLocation.getY() < 10) {
+	                	int width = (int) (e.getComponent().getWidth() + (dragLocation.getX() - e.getX()));
+	                	int height =(int) (e.getComponent().getHeight() + (dragLocation.getY() - e.getY()));
+	                	int movedPointX = (int) (e.getComponent().getX() - (dragLocation.getX() - e.getX()));
+	        			int movedPointY = (int) (e.getComponent().getY() - (dragLocation.getY() - e.getY()));
+	        			
+	                	
+	                	e.getComponent().setBounds(movedPointX, movedPointY, width, height);
+	        	
+	        			dragLocation = e.getPoint();
+	        			System.out.println(e.getPoint());
+	                }
+	                 else {
+	        			int movedPointX = (int) (e.getComponent().getX() + (e.getX() - dragLocation.getX()));
+	        			int movedPointY = (int) (e.getComponent().getY() + (e.getY() - dragLocation.getY()));
 	        			e.getComponent().setLocation(movedPointX,movedPointY);
-	                }
-	            }
+	               }
 		}
 
 		@Override
@@ -390,11 +394,14 @@ class Window extends JFrame {
 
 		@Override
 		public void mousePressed(MouseEvent e) {
+			clickedPoint = e.getPoint();
+			dragLocation = e.getPoint();
 			MapPanel.repaint();
 		}
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
+
 			DrawNodeLine(MapPanel.getGraphics(),storage.rootNode.getNext(0));
 		}
 		
@@ -406,17 +413,40 @@ class Window extends JFrame {
 		g.setColor(Color.BLACK);
 		for(int i=0;i<root.getNextNumber();i++) {
 			DrawNodeLine(g,root.getNext(i));
-			int x1,x2,y1,y2;
-			x1=root.getData().getX()+root.getData().getWidth()/2;
-			y1=root.getData().getY()+root.getData().getHeight()/2;
-			x2=root.getNext(0).getData().getX() + root.getNext(0).getData().getWidth()/2;
-			y2=root.getNext(0).getData().getY() + root.getNext(0).getData().getHeight()/2;
-			g.drawLine(x1,y1,x2,y2);
+			JLabel rootL = root.getData();
+			JLabel rootDL = root.getNext(i).getData();
+			
+			Point[] rootPoint = getSPoint(rootL);
+			Point[] rootDPoint = getSPoint(rootDL);
+			
+			Point[] minDistance = new Point[2];
+			minDistance[0] = rootPoint[0];
+			minDistance[1] = rootDPoint[0];
+			for(int j=0;j<rootPoint.length;j++) {
+				for(int k=0;k<rootDPoint.length;k++) {
+					if(rootPoint[j].distance(rootDPoint[k]) < minDistance[0].distance(minDistance[1])) {
+						minDistance[0] = rootPoint[j];
+						minDistance[1] = rootDPoint[k];
+					}
+				}
+			}
+			g.drawLine((int)minDistance[0].getX(),(int)minDistance[0].getY(),(int)minDistance[1].getX(),(int)minDistance[1].getY());
 			root.getData().repaint();
 			root.getNext(i).getData().repaint();
 		}
 	}
+	
+	Point[] getSPoint(JLabel de) {
+		Point[] returnData = new Point[4];
+		returnData[0] = new Point(de.getX() + de.getWidth()/2,de.getY());
+		returnData[1] = new Point(de.getX() + de.getWidth(),de.getY() + de.getHeight()/2);
+		returnData[2] = new Point(de.getX() + de.getWidth()/2,de.getY()+de.getHeight());
+		returnData[3] = new Point(de.getX(), de.getY()+de.getHeight()/2);
+		return returnData;
+	}
 }
+
+
 
 public class MindMap {
 	public static void main(String[] args) {

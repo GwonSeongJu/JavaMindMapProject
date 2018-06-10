@@ -29,6 +29,7 @@ class Window extends JFrame {
 	JPanel MapPanel; //Mind Map Pane 요소들
 	JButton apply;
 	
+	JPanel Attribute;
 	JTextField textBox; //Attribute Pane 요소들
 	JTextField xBox;
 	JTextField yBox;
@@ -48,7 +49,8 @@ class Window extends JFrame {
 	JLabel pointW;
 	
 	public Window() {
-		storage = new JavaTree();
+		System.out.println("window호출");
+		storage = new JavaTree<JLabel>();
 		setTitle("마인드맵");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //닫으면 종료
 		myPane = getContentPane();
@@ -123,8 +125,9 @@ class Window extends JFrame {
 		JScrollPane TextPane = new JScrollPane(TextArea);
 		TextArea.setFont(nodeFont);
 		MapPanel = new JPanel(); //마인드맵이 출력되는 곳
+		MapPanel.setLayout(null);
 		JScrollPane MapPane = new JScrollPane(MapPanel);
-		JPanel Attribute = new JPanel(); //노드의 정보가 출력되는 곳
+		Attribute = new JPanel(); //노드의 정보가 출력되는 곳
 		
 		Attribute.setLayout(new GridLayout(6, 2));
 		JScrollPane AttributePane = new JScrollPane(Attribute);
@@ -196,11 +199,8 @@ class Window extends JFrame {
 		change.addActionListener(new ChangeListener());
 		RightPane.add(change, BorderLayout.SOUTH);
 		
-		pointW = new JLabel();
-		
+
 		apply.addActionListener(new ApplyListener());
-		
-		MapPanel.add(pointW);
 	}
 	
 	class CloseListener implements ActionListener{	//닫기 리스너
@@ -246,22 +246,30 @@ class Window extends JFrame {
 	
 	class NodeClickListener extends MouseAdapter{	//노드 클릭해서 활성화시키고 정보 출력하는 리스너
 		
+
+		
 		@Override
 		public void mouseClicked(MouseEvent arg) {
-			JLabel l = (JLabel)arg.getSource();
-			if(labelPointer != null)
-				labelPointer.setBorder(LineBorder.createBlackLineBorder());
-			labelPointer = l;
-			l.setBorder(new LineBorder(Color.BLACK, 5));
-			textBox.setText(l.getText());
-			xBox.setText(String.valueOf(l.getX()));
-			yBox.setText(String.valueOf(l.getY()));
-			hBox.setText(String.valueOf(l.getHeight()));
-			wBox.setText(String.valueOf(l.getWidth()));
-			String color = String.format("%02X" + "%02X" + "%02X", l.getBackground().getRed(), l.getBackground().getBlue(), l.getBackground().getGreen());
-			colorBox.setText(color);
-			colorBox.setBackground(l.getBackground());
+			updateInformation(arg);
 		}
+	}
+	
+	void updateInformation(MouseEvent arg) {
+		JLabel l = (JLabel)arg.getSource();
+		if(labelPointer != null)
+			labelPointer.setBorder(LineBorder.createBlackLineBorder());
+		labelPointer = l;
+		l.setBorder(new LineBorder(Color.BLACK, 5));
+		textBox.setText(l.getText());
+		xBox.setText(String.valueOf(l.getX()));
+		yBox.setText(String.valueOf(l.getY()));
+		hBox.setText(String.valueOf(l.getHeight()));
+		wBox.setText(String.valueOf(l.getWidth()));
+		String color = String.format("%02X" + "%02X" + "%02X", l.getBackground().getRed(), l.getBackground().getBlue(), l.getBackground().getGreen());
+		colorBox.setText(color);
+		colorBox.setBackground(l.getBackground());
+		//MapPanel.updateUI();
+		System.out.println(arg.getComponent().getLocation());
 	}
 	
 	class ChangeListener implements ActionListener{	//변경 리스너
@@ -284,8 +292,9 @@ class Window extends JFrame {
 			String text = TextArea.getText();
 			text = text + "\n\n";
 			insertNode(text,storage.rootNode,0);
+
 			MapPanel.updateUI();
-			DrawNodeLine(MapPanel.getGraphics(),storage.rootNode.getNext(0));
+			
 		}
 		
 		private String insertNode(String stringData, Node<JLabel> rootNode, int depth) {
@@ -307,6 +316,7 @@ class Window extends JFrame {
 					preNode.setData(preLabel);
 					preLabel.setOpaque(true);
 	
+					preLabel.setBounds(10, 10, 100, 50);
 					preLabel.setBorder(LineBorder.createBlackLineBorder());
 					preLabel.setPreferredSize(new Dimension(100, 50));
 					preLabel.setBackground(Color.WHITE);
@@ -316,6 +326,7 @@ class Window extends JFrame {
 					preLabel.addMouseMotionListener(new NodeDrag());
 					preLabel.addMouseListener(new NodeDrag());
 					MapPanel.add(preLabel);
+					MapPanel.repaint();
 					storage.insertNode(rootNode, preNode);
 				}
 				if(tapCount>depth) {
@@ -331,6 +342,7 @@ class Window extends JFrame {
 	class NodeDrag implements MouseMotionListener, MouseListener{	//노드 마우스 드래그 리스너
 		@Override
 		public void mouseDragged(MouseEvent e) {
+			updateInformation(e);
 			int movedPointX = e.getComponent().getX() + e.getX();
 			int movedPointY = e.getComponent().getY()+ e.getY();;
 			e.getComponent().setLocation(movedPointX,movedPointY);
@@ -363,7 +375,6 @@ class Window extends JFrame {
 		@Override
 		public void mousePressed(MouseEvent e) {
 			MapPanel.repaint();
-			
 		}
 
 		@Override
@@ -379,11 +390,17 @@ class Window extends JFrame {
 		g.setColor(Color.BLACK);
 		for(int i=0;i<root.getNextNumber();i++) {
 			DrawNodeLine(g,root.getNext(i));
-			g.drawLine(root.getData().getX(), root.getData().getY(), root.getNext(i).getData().getX(), root.getNext(i).getData().getY());
+			int x1,x2,y1,y2;
+			x1=root.getData().getX()+root.getData().getWidth()/2;
+			y1=root.getData().getY()+root.getData().getHeight()/2;
+			x2=root.getNext(0).getData().getX() + root.getNext(0).getData().getWidth()/2;
+			y2=root.getNext(0).getData().getY() + root.getNext(0).getData().getHeight()/2;
+			g.drawLine(x1,y1,x2,y2);
 			root.getData().repaint();
 			root.getNext(i).getData().repaint();
 		}
 	}
+	
 	
 }
 

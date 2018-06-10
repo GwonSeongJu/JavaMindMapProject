@@ -43,13 +43,12 @@ class Window extends JFrame {
 	Font nodeFont = new Font("굴림", Font.PLAIN, 20); //node에 적용될 폰트
 	
 	JavaTree<JLabel> storage;	//node저장소
-	
-	JLabel labelPointer = null;
-	
+	JLabel labelPointer = null; //클릭한 노드를 저장하는 포인터
 	JLabel pointW;
+	boolean drag;
+	Point dragLocation = new Point();
 	
 	public Window() {
-		System.out.println("window호출");
 		storage = new JavaTree<JLabel>();
 		setTitle("마인드맵");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //닫으면 종료
@@ -60,7 +59,6 @@ class Window extends JFrame {
 	}
 	
 	private void makeWindow() {
-		
 		
 		//메뉴
 		JMenuBar menu = new JMenuBar();
@@ -198,9 +196,8 @@ class Window extends JFrame {
 		change = new JButton("변경");
 		change.addActionListener(new ChangeListener());
 		RightPane.add(change, BorderLayout.SOUTH);
-		
-
 		apply.addActionListener(new ApplyListener());
+
 	}
 	
 	class CloseListener implements ActionListener{	//닫기 리스너
@@ -246,12 +243,22 @@ class Window extends JFrame {
 	
 	class NodeClickListener extends MouseAdapter{	//노드 클릭해서 활성화시키고 정보 출력하는 리스너
 		
-
-		
 		@Override
 		public void mouseClicked(MouseEvent arg) {
 			updateInformation(arg);
+			
 		}
+		
+		@Override
+        public void mousePressed(MouseEvent e) {
+            drag = true;
+            dragLocation = e.getPoint();
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            drag = false;
+        }
 	}
 	
 	void updateInformation(MouseEvent arg) {
@@ -269,7 +276,7 @@ class Window extends JFrame {
 		colorBox.setText(color);
 		colorBox.setBackground(l.getBackground());
 		//MapPanel.updateUI();
-		System.out.println(arg.getComponent().getLocation());
+		//System.out.println(arg.getComponent().getLocation());
 	}
 	
 	class ChangeListener implements ActionListener{	//변경 리스너
@@ -340,13 +347,22 @@ class Window extends JFrame {
 	}
 	
 	class NodeDrag implements MouseMotionListener, MouseListener{	//노드 마우스 드래그 리스너
-		@Override
-		public void mouseDragged(MouseEvent e) {
-			updateInformation(e);
-			int movedPointX = e.getComponent().getX() + e.getX();
-			int movedPointY = e.getComponent().getY()+ e.getY();;
-			e.getComponent().setLocation(movedPointX,movedPointY);
-			
+		
+		 @Override
+	        public void mouseDragged(MouseEvent e) {
+	            if (drag && (labelPointer != null)) {
+	                if (dragLocation.getX()>(labelPointer.getWidth()-10) && dragLocation.getY()>(labelPointer.getHeight()-10)) {
+	                	updateInformation(e);
+	                    labelPointer. setSize((int)(labelPointer.getWidth()+(e.getPoint().getX()-dragLocation.getX())), (int)(labelPointer.getHeight()+(e.getPoint().getY()-dragLocation.getY())));
+	                    dragLocation = e.getPoint();
+	                }
+	                else {
+	                	updateInformation(e);
+	        			int movedPointX = e.getComponent().getX() + e.getX();
+	        			int movedPointY = e.getComponent().getY() + e.getY();
+	        			e.getComponent().setLocation(movedPointX,movedPointY);
+	                }
+	            }
 		}
 
 		@Override
@@ -400,8 +416,6 @@ class Window extends JFrame {
 			root.getNext(i).getData().repaint();
 		}
 	}
-	
-	
 }
 
 public class MindMap {

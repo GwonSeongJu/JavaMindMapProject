@@ -315,8 +315,9 @@ class Window extends JFrame {
 					}
 					preLabel.setBorder(LineBorder.createBlackLineBorder());
 					preLabel.setPreferredSize(new Dimension(100, 50));
-					preLabel.setBackground(Color.WHITE);
-					preLabel.setFont(nodeFont);;
+					preLabel.setBackground(setColor(depth));
+					preLabel.setForeground(new Color(255-preLabel.getBackground().getRed(), 255-preLabel.getBackground().getGreen(), 255-preLabel.getBackground().getBlue()));
+					preLabel.setFont(nodeFont);
 					preLabel.setHorizontalAlignment(SwingConstants.CENTER);
 					preLabel.addMouseMotionListener(new NodeDrag());
 					preLabel.addMouseListener(new NodeDrag());
@@ -331,6 +332,17 @@ class Window extends JFrame {
 					return stringData;
 				}
 			}
+		}
+		
+		private Color setColor(int num) {
+			if(num>8)
+				return new Color(255, 255, 255);
+			else if (num%3==0)
+				return new Color(255, 150+(50*num/3), 150+(50*num/3));
+			else if (num%3==1)
+				return new Color(150+(50*num/3), 255, 150+(50*num/3));
+			else
+				return new Color(150+(50*num/3), 150+(50*num/3), 255);
 		}
 	}
 	

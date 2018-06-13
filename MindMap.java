@@ -125,7 +125,8 @@ class Window extends JFrame {
 		TextArea.setFont(nodeFont);
 		MapPanel = new JPanel(); //마인드맵이 출력되는 곳
 		MapPanel.setLayout(null);
-		JScrollPane MapPane = new JScrollPane(MapPanel,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+		
+		JScrollPane MapPane = new JScrollPane(MapPanel);
 		Attribute = new JPanel(); //노드의 정보가 출력되는 곳
 		
 		Attribute.setLayout(new GridLayout(6, 2));
@@ -262,9 +263,10 @@ class Window extends JFrame {
 		//System.out.println(arg.getComponent().getLocation());
 	}
 	
-	void setNodePosition(Node<JLabel> root) {
+	boolean setNodePosition(Node<JLabel> root) {
+
 		if(root.getNextNumber()==0)
-			return;
+			return true;
 		Point rootP = root.getData().getLocation();
 		rootP.setLocation(rootP.getX() + root.getData().getWidth()/2, rootP.getY() + root.getData().getHeight()/2);
 		
@@ -274,10 +276,13 @@ class Window extends JFrame {
 			if (root.getNext(j).getNextNumber()!=0) {
 				Point tmp = new Point();
 				tmp.setLocation(rootP.getX()/2, rootP.getY()/2);
-				setNodePosition(root.getNext(j),tmp);
+				if(!setNodePosition(root.getNext(j),tmp))
+					return false;
+				
 			}
 			
 		}
+		return true;
 	}
 	
 	boolean setNodePosition(Node<JLabel> root, Point lengh) {
@@ -289,14 +294,11 @@ class Window extends JFrame {
 		for(int i=0,j=0; i<360;i+=rec,j++) {
 			int childX = (int)(rootP.getX()+(lengh.getX() / 2)*Math.cos(Math.toRadians(i)) - root.getNext(j).getData().getWidth()/2);
 			int childY = (int)(rootP.getY() + (lengh.getY()/2)*Math.sin(Math.toRadians(i)) - root.getNext(j).getData().getHeight()/2);
-			/*
+			
 			if ( checkNodeOffset(new Point(childX,childY),new Point(root.getNext(j).getData().getWidth(),root.getNext(j).getData().getHeight()))) {
-				sizeUpMapPanel();
-				storage.rootNode.getNext(0).getData().setLocation(MapPanel.getWidth()/2,MapPanel.getHeight()/2);
-				setNodePosition(storage.rootNode.getNext(0));
 				return false;
 			}
-			*/
+			
 			root.getNext(j).getData().setLocation(childX, childY);
 			if (root.getNext(j).getNextNumber()!=0) {
 				Point tmp = new Point();
@@ -310,15 +312,12 @@ class Window extends JFrame {
 		return true;
 	}
 	
-	void sizeUpMapPanel() {
-		MapPanel.setSize(MapPanel.getWidth() * 2, MapPanel.getHeight() * 2);
-	}
 	
 	boolean checkNodeOffset(Point p,Point size) {
-		if(MapPanel.findComponentAt((int)p.getX(), (int)p.getY()) == null)
-			if(MapPanel.findComponentAt((int)(p.getX()+size.getX()),(int)p.getY())==null){
-				if(MapPanel.findComponentAt((int)(p.getX() + size.getX()),(int)(p.getY() + size.getY() ))==null) {
-					if(MapPanel.findComponentAt((int)p.getX(), (int)(p.getY() + size.getY()))==null) {
+		if(MapPanel.getComponentAt((int)p.getX(), (int)p.getY()) == MapPanel)
+			if(MapPanel.getComponentAt((int)(p.getX()+size.getX()),(int)p.getY())==MapPanel){
+				if(MapPanel.getComponentAt((int)(p.getX() + size.getX()),(int)(p.getY() + size.getY() ))==MapPanel) {
+					if(MapPanel.getComponentAt((int)p.getX(), (int)(p.getY() + size.getY()))==MapPanel) {
 						return false;
 					}
 				}
@@ -345,6 +344,7 @@ class Window extends JFrame {
 		@SuppressWarnings("deprecation")
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
+			MapPanel.setPreferredSize(new Dimension(MapPanel.getWidth(),MapPanel.getHeight()));
 			String text = TextArea.getText();
 			text = text + "\n\n";
 			if(MapPanel.countComponents()>0) {
@@ -352,7 +352,18 @@ class Window extends JFrame {
 				storage.rootNode.deleteNext(0);
 			}
 			insertNode(text,storage.rootNode,0);
-			setNodePosition(storage.rootNode.getNext(0));			
+			
+			while(!setNodePosition(storage.rootNode.getNext(0))) {
+				
+				double DimX = MapPanel.getPreferredSize().getWidth()*2;
+				double DimY = MapPanel.getPreferredSize().getHeight()*2;
+				Dimension tmp = new Dimension();
+				tmp.setSize(DimX, DimY);
+				MapPanel.setPreferredSize(tmp);
+				MapPanel.setSize(tmp);
+				storage.rootNode.getNext(0).getData().setLocation(MapPanel.getWidth()/2,MapPanel.getHeight()/2);
+			}
+			
 			DrawNodeLine(MapPanel.getGraphics(),storage.rootNode.getNext(0));
 			
 		}

@@ -10,6 +10,8 @@ import java.util.ArrayList;
 
 import javax.swing.*;
 import javax.swing.event.*;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.border.*;
 import com.google.gson.*;
 
@@ -59,6 +61,8 @@ class Window extends JFrame {
 	
 	Point clickedPoint = new Point();
 	Point dragLocation = new Point();
+	
+	File pointFile = null; //현재 저장되고있는 파일
 	
 	public Window() {
 		storage = new JavaTree<JLabel>();
@@ -383,14 +387,21 @@ class Window extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
+			if(pointFile == null) {
+				JFileChooser jfc = new JFileChooser();
+				int result = jfc.showSaveDialog(myPane);
+				if(result == JFileChooser.APPROVE_OPTION) {
+					pointFile = jfc.getSelectedFile();
+				}
+			}
 			try {
-				FileWriter fw = new FileWriter(new File("..\\test123.json"),false);
+				FileWriter fw = new FileWriter(pointFile,false);
 				fw.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 			
-			NodetoString(storage.rootNode.getNext(0),new File("..\\test123.json"));
+			NodetoString(storage.rootNode.getNext(0),pointFile);
 		}
 		
 	}

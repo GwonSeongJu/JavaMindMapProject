@@ -558,8 +558,6 @@ class Window extends JFrame {
 	}
 	
 	private String insertNode(String stringData, Node<JLabel> rootNode, int depth) {
-		if(rootNode == null)
-			return null;
 		Node<JLabel> preNode = null;
 		
 		while(true) {

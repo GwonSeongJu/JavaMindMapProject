@@ -397,11 +397,38 @@ class Window extends JFrame {
 		 @Override
 	        public void mouseDragged(MouseEvent e) { 
          	updateInformation(e);
-	                if (dragLocation.getX()>e.getComponent().getWidth()-10 || dragLocation.getY() > e.getComponent().getHeight() -10) {
+         	if(dragLocation.getX()>e.getComponent().getWidth()-10 && dragLocation.getY()<10) {
+         		int width = (int) (e.getComponent().getWidth() - (dragLocation.getX() - e.getX()));
+            	int height =(int) (e.getComponent().getHeight() + (dragLocation.getY() - e.getY()));
+            	int movedPointX = (int) (e.getComponent().getX());
+    			int movedPointY = (int) (e.getComponent().getY() - (dragLocation.getY() - e.getY()));
+    			if(width<100) width = 100;
+            	if(height<50) height = 50;
+            	
+            	e.getComponent().setBounds(movedPointX, movedPointY, width, height);
+    	
+    			dragLocation = e.getPoint();
+         	}
+         	
+         	else if(dragLocation.getX()<10 && dragLocation.getY() > e.getComponent().getHeight()-10) {
+         		int width = (int) (e.getComponent().getWidth() + (dragLocation.getX() - e.getX()));
+            	int height =(int) (e.getComponent().getHeight() - (dragLocation.getY() - e.getY()));
+            	int movedPointX = (int) (e.getComponent().getX() - (dragLocation.getX() - e.getX()));
+    			int movedPointY = (int) (e.getComponent().getY());
+    			if(width<100) width = 100;
+            	if(height<50) height = 50;
+            	
+            	e.getComponent().setBounds(movedPointX, movedPointY, width, height);
+    	
+    			dragLocation = e.getPoint();
+         	}
+         	else if (dragLocation.getX()>e.getComponent().getWidth()-10 || dragLocation.getY() > e.getComponent().getHeight() -10) {
 	                	//dragLocation.getX()>(labelPointer.getWidth()-10) && dragLocation.getY()>(labelPointer.getHeight()-10)
-	                	System.out.println("Å©±â");
 	                	int width = (int) (e.getComponent().getWidth() + (e.getX() - dragLocation.getX()));
 	                	int height =(int) (e.getComponent().getHeight() + (e.getY() - dragLocation.getY()));
+	                	if(width<100) width = 100;
+	                	if(height<50) height = 50;
+	                	
 	                	e.getComponent().setSize(width,height);
 	                	dragLocation = e.getPoint();
 	                }
@@ -410,12 +437,13 @@ class Window extends JFrame {
 	                	int height =(int) (e.getComponent().getHeight() + (dragLocation.getY() - e.getY()));
 	                	int movedPointX = (int) (e.getComponent().getX() - (dragLocation.getX() - e.getX()));
 	        			int movedPointY = (int) (e.getComponent().getY() - (dragLocation.getY() - e.getY()));
-	        			
+	        			if(width<100) width = 100;
+	                	if(height<50) height = 50;
 	                	
 	                	e.getComponent().setBounds(movedPointX, movedPointY, width, height);
 	        	
 	        			dragLocation = e.getPoint();
-	        			System.out.println(e.getPoint());
+	      
 	                }
 	                 else {
 	        			int movedPointX = (int) (e.getComponent().getX() + (e.getX() - dragLocation.getX()));

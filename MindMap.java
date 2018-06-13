@@ -37,7 +37,7 @@ class Window extends JFrame {
 	
 	JTextArea TextArea; //Text Editor Pane 요소들
 	
-	JPanel MapPanel; //Mind Map Pane 요소들
+	MyMindPanel MapPanel; //Mind Map Pane 요소들
 	JButton apply;
 	
 	JPanel Attribute;
@@ -96,11 +96,9 @@ class Window extends JFrame {
 		menu.add(menuClose);
 		menuNewFile.addActionListener(new NewFileListener());
 		menuOpen.addActionListener(new OpenListener());
-		menuOpen.addMouseMotionListener(new UpdateLineListener());
 		menuSave.addActionListener(new SaveListener());
 		menuSaveName.addActionListener(new OtherSaveListener());
 		menuApply.addActionListener(new ApplyListener());
-		menuApply.addMouseMotionListener(new UpdateLineListener());
 		menuChange.addActionListener(new ChangeListener());
 		menuClose.addActionListener(new CloseListener());
 		
@@ -126,11 +124,9 @@ class Window extends JFrame {
 		tool.add(toolClose);
 		toolNewFile.addActionListener(new NewFileListener());
 		toolOpen.addActionListener(new OpenListener());
-		toolOpen.addMouseMotionListener(new UpdateLineListener());
 		toolSave.addActionListener(new SaveListener());
 		toolSaveName.addActionListener(new OtherSaveListener());
 		toolApply.addActionListener(new ApplyListener());
-		toolApply.addMouseMotionListener(new UpdateLineListener());
 		toolChange.addActionListener(new ChangeListener());
 		toolClose.addActionListener(new CloseListener());
 
@@ -151,7 +147,7 @@ class Window extends JFrame {
 		TextArea.setTabSize(4);
 		JScrollPane TextPane = new JScrollPane(TextArea);
 		TextArea.setFont(nodeFont);
-		MapPanel = new JPanel(); //마인드맵이 출력되는 곳
+		MapPanel = new MyMindPanel(); //마인드맵이 출력되는 곳
 		MapPanel.setLayout(null);
 		
 		JScrollPane MapPane = new JScrollPane(MapPanel);
@@ -171,7 +167,6 @@ class Window extends JFrame {
 		LeftPane.add(textEditorLabel, BorderLayout.NORTH);
 		LeftPane.add(TextPane, BorderLayout.CENTER);
 		apply = new JButton("적용");
-		apply.addMouseMotionListener(new UpdateLineListener());
 		LeftPane.add(apply, BorderLayout.SOUTH);
 
 		BasePane2.setLeftComponent(CenterPane); // MindMap, Attribute Pane 배치
@@ -191,6 +186,7 @@ class Window extends JFrame {
 		textLabel.setFont(paneFont);
 		Attribute.add(textLabel);
 		textBox = new JTextField();
+		textBox.setEditable(false);
 		textBox.setFont(nodeFont);
 		Attribute.add(textBox);
 		JLabel xLabel = new JLabel("X:	");
@@ -231,6 +227,34 @@ class Window extends JFrame {
 
 	}
 	
+	class MyMindPanel extends JPanel{
+		@Override
+		public void updateUI() {
+			super.updateUI();
+			if(storage.rootNode.getNextNumber()!=0)
+			DrawNodeLine(this.getGraphics(),storage.rootNode.getNext(0));
+		}
+		@Override
+		public void paint(Graphics g) {
+			super.paint(g);
+			if(storage.rootNode.getNextNumber()!=0)
+			DrawNodeLine(this.getGraphics(),storage.rootNode.getNext(0));
+		}
+		@Override
+		public void update(Graphics g) {
+			super.update(g);
+			if(storage.rootNode.getNextNumber()!=0)
+				DrawNodeLine(this.getGraphics(),storage.rootNode.getNext(0));
+		}
+		
+		@Override
+		public void repaint() {
+			super.repaint();
+			if(storage.rootNode.getNextNumber()!=0)
+				DrawNodeLine(this.getGraphics(),storage.rootNode.getNext(0));
+		}
+	}
+	
 	class NewFileListener implements ActionListener{	//새로 만들기 리스너
 		
 		@Override
@@ -258,23 +282,7 @@ class Window extends JFrame {
 		}
 	}
 	
-	class UpdateLineListener implements MouseMotionListener{
-
-		@Override
-		public void mouseDragged(MouseEvent e) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void mouseMoved(MouseEvent e) {
-			if(storage.rootNode.getNextNumber()>0)
-				DrawNodeLine(MapPanel.getGraphics(),storage.rootNode.getNext(0));
-		}
-
 	
-		
-	}
 	
 	class ColorListener extends MouseAdapter	{	//색깔 선택 리스너
 		
@@ -505,7 +513,7 @@ class Window extends JFrame {
 
 		@Override
 		public void mouseMoved(MouseEvent e) {
-			
+			DrawNodeLine(MapPanel.getGraphics(),storage.rootNode.getNext(0));
 		}
 
 		@Override
@@ -686,8 +694,6 @@ class Window extends JFrame {
 				}
 			}
 			g.drawLine((int)minDistance[0].getX(),(int)minDistance[0].getY(),(int)minDistance[1].getX(),(int)minDistance[1].getY());
-			root.getData().repaint();
-			root.getNext(i).getData().repaint();
 		}
 	}
 	class Saveform{

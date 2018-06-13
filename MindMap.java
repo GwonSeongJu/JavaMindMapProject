@@ -342,14 +342,17 @@ class Window extends JFrame {
 	
 	class ApplyListener implements ActionListener{	//적용 리스너
 
+		@SuppressWarnings("deprecation")
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			String text = TextArea.getText();
 			text = text + "\n\n";
+			if(MapPanel.countComponents()>0) {
+				MapPanel.removeAll();
+				storage.rootNode.deleteNext(0);
+			}
 			insertNode(text,storage.rootNode,0);
-			setNodePosition(storage.rootNode.getNext(0));	
-			MapPanel.updateUI();
-			
+			setNodePosition(storage.rootNode.getNext(0));			
 			DrawNodeLine(MapPanel.getGraphics(),storage.rootNode.getNext(0));
 			
 		}

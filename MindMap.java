@@ -122,6 +122,7 @@ class Window extends JFrame {
 		toolOpen.addActionListener(new OpenListener());
 		toolOpen.addMouseMotionListener(new UpdateLineListener());
 		toolSave.addActionListener(new SaveListener());
+		toolSaveName.addActionListener(new OtherSaveListener());
 		toolApply.addActionListener(new ApplyListener());
 		toolApply.addMouseMotionListener(new UpdateLineListener());
 		toolChange.addActionListener(new ChangeListener());
@@ -382,7 +383,26 @@ class Window extends JFrame {
 			}
 		return true;
 	}
-	
+	class OtherSaveListener implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			JFileChooser jfc = new JFileChooser();
+			int result = jfc.showSaveDialog(myPane);
+			if(result == JFileChooser.APPROVE_OPTION) {
+				pointFile = jfc.getSelectedFile();
+			}
+			try {
+				FileWriter fw = new FileWriter(pointFile,false);
+				fw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			NodetoString(storage.rootNode.getNext(0),pointFile);
+		}
+		
+	}
 	class SaveListener implements ActionListener{
 
 		@Override

@@ -735,6 +735,16 @@ class Window extends JFrame {
 				preNode.setData(preLabel);
 				preLabel.setOpaque(true);
 				preLabel.setBounds(workClass.x, workClass.y, workClass.width, workClass.height);
+				if(workClass.x + workClass.width > MapPanel.getPreferredSize().getWidth()) {
+					int prevWidth = workClass.x + workClass.width + 100;
+					MapPanel.setPreferredSize(new Dimension(prevWidth,(int) MapPanel.getPreferredSize().getHeight()));
+				}
+				if(workClass.y + workClass.height > MapPanel.getPreferredSize().getHeight()) {
+					int prevHeight = workClass.y + workClass.height + 100;
+					MapPanel.setPreferredSize(new Dimension((int) MapPanel.getPreferredSize().getWidth(),prevHeight));
+				}
+			
+				
 				preLabel.setBorder(LineBorder.createBlackLineBorder());
 				preLabel.setPreferredSize(new Dimension(workClass.width, workClass.height));
 				preLabel.setBackground(new Color(workClass.color[0],workClass.color[1],workClass.color[2]));

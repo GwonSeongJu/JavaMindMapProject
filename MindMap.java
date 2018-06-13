@@ -435,7 +435,12 @@ class Window extends JFrame {
 				MapPanel.removeAll();
 				storage.rootNode.deleteNext(0);
 			}
-			ArrayList<Saveform> list = OpenNodeFile(new File("..\\\\test123.json"));
+			JFileChooser jfc = new JFileChooser();
+			int result = jfc.showOpenDialog(myPane);
+	        if(result != JFileChooser.APPROVE_OPTION) return;
+	        
+	        File fileName = jfc.getSelectedFile();
+			ArrayList<Saveform> list = OpenNodeFile(fileName);
 			insertNode(list,storage.rootNode,0);
 			MapPanel.updateUI();
 		}

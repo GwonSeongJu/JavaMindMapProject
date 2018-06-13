@@ -63,6 +63,7 @@ class Window extends JFrame {
 	Point dragLocation = new Point();
 	
 	File pointFile = null; //현재 저장되고있는 파일
+
 	
 	public Window() {
 		storage = new JavaTree<JLabel>();
@@ -94,7 +95,12 @@ class Window extends JFrame {
 		menu.add(menuChange);
 		menu.add(menuClose);
 		menuNewFile.addActionListener(new NewFileListener());
+		menuOpen.addActionListener(new OpenListener());
+		menuOpen.addMouseMotionListener(new UpdateLineListener());
+		menuSave.addActionListener(new SaveListener());
+		menuSaveName.addActionListener(new OtherSaveListener());
 		menuApply.addActionListener(new ApplyListener());
+		menuApply.addMouseMotionListener(new UpdateLineListener());
 		menuChange.addActionListener(new ChangeListener());
 		menuClose.addActionListener(new CloseListener());
 		
@@ -165,6 +171,7 @@ class Window extends JFrame {
 		LeftPane.add(textEditorLabel, BorderLayout.NORTH);
 		LeftPane.add(TextPane, BorderLayout.CENTER);
 		apply = new JButton("적용");
+		apply.addMouseMotionListener(new UpdateLineListener());
 		LeftPane.add(apply, BorderLayout.SOUTH);
 
 		BasePane2.setLeftComponent(CenterPane); // MindMap, Attribute Pane 배치

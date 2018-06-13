@@ -449,9 +449,20 @@ class Window extends JFrame {
 	        File fileName = jfc.getSelectedFile();
 			ArrayList<Saveform> list = OpenNodeFile(fileName);
 			insertNode(list,storage.rootNode,0);
+			TextArea.setText(getTextValue(storage.rootNode.getNext(0),new String("")));
 			MapPanel.updateUI();
 		}
 		
+	}
+	
+	String getTextValue(Node<JLabel> point,String word) {
+		for(int i=0;i<storage.findNodeDepth(point);i++)
+			word += '\t';
+		word+=point.getData().getText() + '\n';
+		for(int i=0;i<point.getNextNumber();i++) {
+			word = getTextValue(point.getNext(i),word);
+		}
+		return word;
 	}
 	
 	class ChangeListener implements ActionListener{	//변경 리스너

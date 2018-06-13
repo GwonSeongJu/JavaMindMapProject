@@ -252,6 +252,7 @@ class Window extends JFrame {
 		wBox.setText("");
 		colorBox.setText("");
 		colorBox.setBackground(Color.WHITE);
+		MapPanel.repaint();
 		}
 	}
 	
@@ -287,6 +288,7 @@ class Window extends JFrame {
 		public void mouseClicked(MouseEvent arg) {
 			if(preSelectionNode!=null) {
 				preSelectionNode.setBackground(new Color(255-preSelectionNode.getBackground().getRed(), 255-preSelectionNode.getBackground().getGreen(), 255-preSelectionNode.getBackground().getBlue()));
+				preSelectionNode.setForeground(new Color(255-preSelectionNode.getBackground().getRed(), 255-preSelectionNode.getBackground().getGreen(), 255-preSelectionNode.getBackground().getBlue()));
 				preSelectionNode = null;
 			}
 			if(labelPointer != null)
@@ -307,8 +309,10 @@ class Window extends JFrame {
 
 	
 	void updateInformation(MouseEvent arg) {
-		if(preSelectionNode!=null)
+		if(preSelectionNode!=null) {
 			preSelectionNode.setBackground(new Color(255-preSelectionNode.getBackground().getRed(), 255-preSelectionNode.getBackground().getGreen(), 255-preSelectionNode.getBackground().getBlue()));
+			preSelectionNode.setForeground(new Color(255-preSelectionNode.getBackground().getRed(), 255-preSelectionNode.getBackground().getGreen(), 255-preSelectionNode.getBackground().getBlue()));
+		}
 		
 		JLabel l = (JLabel)arg.getSource();
 		if(labelPointer != null) {
@@ -319,6 +323,7 @@ class Window extends JFrame {
 		preSelectionNode = l;
 		l.setBorder(new LineBorder(Color.BLACK, 5));
 		l.setBackground(new Color(255-l.getBackground().getRed(), 255-l.getBackground().getGreen(), 255-l.getBackground().getBlue()));
+		l.setForeground(new Color(255-l.getBackground().getRed(), 255-l.getBackground().getGreen(), 255-l.getBackground().getBlue()));
 		textBox.setText(l.getText());
 		xBox.setText(String.valueOf(l.getX()));
 		yBox.setText(String.valueOf(l.getY()));
@@ -326,7 +331,7 @@ class Window extends JFrame {
 		wBox.setText(String.valueOf(l.getWidth()));
 		String color = String.format("%02X" + "%02X" + "%02X", l.getBackground().getRed(), l.getBackground().getBlue(), l.getBackground().getGreen());
 		colorBox.setText(color);
-		colorBox.setBackground(l.getBackground());
+		colorBox.setBackground(new Color(255-l.getBackground().getRed(), 255-l.getBackground().getGreen(), 255-l.getBackground().getBlue()));
 		//MapPanel.updateUI();
 		//System.out.println(arg.getComponent().getLocation());
 	}
@@ -476,7 +481,7 @@ class Window extends JFrame {
 				labelPointer.setLocation(Integer.parseInt(xBox.getText()), Integer.parseInt(yBox.getText()));
 				labelPointer.setText(textBox.getText());
 				labelPointer.setBounds(Integer.parseInt(xBox.getText()), Integer.parseInt(yBox.getText()), Integer.parseInt(wBox.getText()), Integer.parseInt(hBox.getText()));
-				labelPointer.setBackground(colorBox.getBackground());
+				labelPointer.setBackground(new Color(255-colorBox.getBackground().getRed(),255-colorBox.getBackground().getGreen(),255-colorBox.getBackground().getBlue()));
 			}
 		}
 	}
@@ -577,6 +582,7 @@ class Window extends JFrame {
 
 
 			DrawNodeLine(MapPanel.getGraphics(),storage.rootNode.getNext(0));
+			updateInformation(e);
 		}
 		
 	};

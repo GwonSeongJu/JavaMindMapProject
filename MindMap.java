@@ -397,7 +397,7 @@ class Window extends JFrame {
 		 @Override
 	        public void mouseDragged(MouseEvent e) { 
          	updateInformation(e);
-         	if(dragLocation.getX()>e.getComponent().getWidth()-10 && dragLocation.getY()<10) {
+         	if(dragLocation.getX()>e.getComponent().getWidth()-20 && dragLocation.getY()<20) {
          		int width = (int) (e.getComponent().getWidth() - (dragLocation.getX() - e.getX()));
             	int height =(int) (e.getComponent().getHeight() + (dragLocation.getY() - e.getY()));
             	int movedPointX = (int) (e.getComponent().getX());
@@ -410,7 +410,7 @@ class Window extends JFrame {
     			dragLocation = e.getPoint();
          	}
          	
-         	else if(dragLocation.getX()<10 && dragLocation.getY() > e.getComponent().getHeight()-10) {
+         	else if(dragLocation.getX()<20 && dragLocation.getY() > e.getComponent().getHeight()-20) {
          		int width = (int) (e.getComponent().getWidth() + (dragLocation.getX() - e.getX()));
             	int height =(int) (e.getComponent().getHeight() - (dragLocation.getY() - e.getY()));
             	int movedPointX = (int) (e.getComponent().getX() - (dragLocation.getX() - e.getX()));
@@ -422,7 +422,7 @@ class Window extends JFrame {
     	
     			dragLocation = e.getPoint();
          	}
-         	else if (dragLocation.getX()>e.getComponent().getWidth()-10 || dragLocation.getY() > e.getComponent().getHeight() -10) {
+         	else if (dragLocation.getX()>e.getComponent().getWidth()-20 || dragLocation.getY() > e.getComponent().getHeight() -20) {
 	                	//dragLocation.getX()>(labelPointer.getWidth()-10) && dragLocation.getY()>(labelPointer.getHeight()-10)
 	                	int width = (int) (e.getComponent().getWidth() + (e.getX() - dragLocation.getX()));
 	                	int height =(int) (e.getComponent().getHeight() + (e.getY() - dragLocation.getY()));
@@ -432,7 +432,7 @@ class Window extends JFrame {
 	                	e.getComponent().setSize(width,height);
 	                	dragLocation = e.getPoint();
 	                }
-	                else if(dragLocation.getX() < 10 || dragLocation.getY() < 10) {
+	                else if(dragLocation.getX() < 20 || dragLocation.getY() < 20) {
 	                	int width = (int) (e.getComponent().getWidth() + (dragLocation.getX() - e.getX()));
 	                	int height =(int) (e.getComponent().getHeight() + (dragLocation.getY() - e.getY()));
 	                	int movedPointX = (int) (e.getComponent().getX() - (dragLocation.getX() - e.getX()));

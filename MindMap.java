@@ -1,8 +1,13 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.border.*;
+import com.google.gson.*;
 
 class Window extends JFrame {
 	private Container myPane; //프레임
@@ -106,6 +111,7 @@ class Window extends JFrame {
 		tool.add(toolChange);
 		tool.add(toolClose);
 		toolNewFile.addActionListener(new NewFileListener());
+		toolSave.addActionListener(new SaveListener());
 		toolApply.addActionListener(new ApplyListener());
 		toolChange.addActionListener(new ChangeListener());
 		toolClose.addActionListener(new CloseListener());
@@ -348,6 +354,21 @@ class Window extends JFrame {
 		return true;
 	}
 	
+	class SaveListener implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			try {
+				FileWriter fw = new FileWriter(new File("..\\test123.json"),false);
+				fw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			SaveNodeToFile(storage.rootNode.getNext(0),new File("..\\test123.json"));
+		}
+		
+	}
 	
 	class ChangeListener implements ActionListener{	//변경 리스너
 		
@@ -553,6 +574,35 @@ class Window extends JFrame {
 		}
 	}
 	
+	void SaveNodeToFile(Node<JLabel> point,File f) {
+		Gson gson = new Gson();
+		try {
+			FileWriter fw = new FileWriter(f,true);
+			fw.write(gson.toJson(SaveFormat(point)));
+			fw.flush();
+			
+			fw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		for(int i=0;i<point.getNextNumber();i++) {
+			SaveNodeToFile(point.getNext(i),f);
+		}
+	}
+	
+	JsonObject SaveFormat(Node<JLabel> target) {
+		JsonObject object = new JsonObject();
+		object.addProperty("text", target.getData().getText());
+		object.addProperty("x", target.getData().getX());
+		object.addProperty("y", target.getData().getY());
+		object.addProperty("width", target.getData().getWidth());
+		object.addProperty("height", target.getData().getHeight());
+		object.addProperty("color", target.getData().getGraphics().getColor().toString());
+		object.addProperty("depth", storage.findNodeDepth(target));
+		return object;
+	}
+	
 	Point[] getSPoint(JLabel de) {
 		Point[] returnData = new Point[4];
 		returnData[0] = new Point(de.getX() + de.getWidth()/2,de.getY());
@@ -562,6 +612,8 @@ class Window extends JFrame {
 		return returnData;
 	}
 }
+
+
 
 
 

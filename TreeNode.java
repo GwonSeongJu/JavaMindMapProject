@@ -1,4 +1,4 @@
-import java.util.ArrayList;
+import java.util.*;
 
 class Node<T>{
 	private T data;
@@ -53,5 +53,21 @@ class JavaTree<T>{
 	public void deleteNode(Node<T> topNode,Node<T> inputNode) {
 		topNode.deleteNode(inputNode);
 	}
+
+	public int findNodeDepth(Node<T> target) {
+		return findNodeDepth(target,rootNode.getNext(0),0);
+	}
 	
+	private int findNodeDepth(Node<T> target,Node<T> point,int depth) {
+		if(point == target) {
+			return depth;
+		}
+		for(int i=0;i<point.getNextNumber();i++) {
+			int result = findNodeDepth(target,point.getNext(i),depth+1);
+			if(result >= 0) {
+				return result;
+			}
+		}
+		return -1;
+	}
 }

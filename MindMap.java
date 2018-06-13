@@ -583,7 +583,9 @@ class Window extends JFrame {
 		}
 		insertNode(text,storage.rootNode,0);
 		MapPanel.updateUI();
-		
+		if(storage.rootNode.getNextNumber()==0) {
+			return;
+		}
 		if(isNewFile == false) {
 			while(!setNodePosition(storage.rootNode.getNext(0))) {
 			

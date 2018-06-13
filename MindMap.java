@@ -1,8 +1,12 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -111,6 +115,7 @@ class Window extends JFrame {
 		tool.add(toolChange);
 		tool.add(toolClose);
 		toolNewFile.addActionListener(new NewFileListener());
+		toolOpen.addActionListener(new OpenListener());
 		toolSave.addActionListener(new SaveListener());
 		toolApply.addActionListener(new ApplyListener());
 		toolChange.addActionListener(new ChangeListener());
@@ -365,7 +370,23 @@ class Window extends JFrame {
 				e.printStackTrace();
 			}
 			
-			SaveNodeToFile(storage.rootNode.getNext(0),new File("..\\test123.json"));
+			NodetoString(storage.rootNode.getNext(0),new File("..\\test123.json"));
+		}
+		
+	}
+	
+	class OpenListener implements ActionListener{
+
+		@SuppressWarnings("deprecation")
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			if(MapPanel.countComponents()>0) {
+				MapPanel.removeAll();
+				storage.rootNode.deleteNext(0);
+			}
+			ArrayList<Saveform> list = OpenNodeFile(new File("..\\\\test123.json"));
+			insertNode(list,storage.rootNode,0);
+			MapPanel.updateUI();
 		}
 		
 	}
@@ -601,36 +622,99 @@ class Window extends JFrame {
 			root.getNext(i).getData().repaint();
 		}
 	}
+	class Saveform{
+		int x,y;
+		int width,height;
+		int color[];
+		String text;
+		int depth;
+		Saveform(Node<JLabel> target){
+			x = target.getData().getX();
+			y = target.getData().getY();
+			width = target.getData().getWidth();
+			height = target.getData().getHeight();
+			text = target.getData().getText();
+			depth = storage.findNodeDepth(target);
+			color = new int[3];
+			color[0] = target.getData().getBackground().getRed();
+			color[1] = target.getData().getBackground().getGreen();
+			color[2] = target.getData().getBackground().getBlue();
+		}
+	}
 	
-	void SaveNodeToFile(Node<JLabel> point,File f) {
-		Gson gson = new Gson();
+	void NodetoString(Node<JLabel> root,File f) {
 		try {
 			FileWriter fw = new FileWriter(f,true);
-			fw.write(gson.toJson(SaveFormat(point)));
+			fw.write(new Gson().toJson(new Saveform(root)));
+			fw.write("\n");
 			fw.flush();
-			
 			fw.close();
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		for(int i=0;i<point.getNextNumber();i++) {
-			SaveNodeToFile(point.getNext(i),f);
+		for(int i=0;i<root.getNextNumber();i++) {
+			NodetoString(root.getNext(i),f);
 		}
 	}
 	
-	JsonObject SaveFormat(Node<JLabel> target) {
-		JsonObject object = new JsonObject();
-		object.addProperty("text", target.getData().getText());
-		object.addProperty("x", target.getData().getX());
-		object.addProperty("y", target.getData().getY());
-		object.addProperty("width", target.getData().getWidth());
-		object.addProperty("height", target.getData().getHeight());
-		object.addProperty("color", target.getData().getGraphics().getColor().toString());
-		object.addProperty("depth", storage.findNodeDepth(target));
-		return object;
+	ArrayList<Saveform> insertNode(ArrayList<Saveform> list,Node<JLabel> rootNode,int _depth) {
+        Node<JLabel> preNode = null;
+		while(true) {
+			if(list.isEmpty())
+				return list;
+			
+			Saveform workClass = list.get(0);
+			if(workClass.depth==_depth) {
+				list.remove(workClass);
+				JLabel preLabel = new JLabel(workClass.text);
+				preNode = new Node<>();
+				preNode.setData(preLabel);
+				preLabel.setOpaque(true);
+				preLabel.setBounds(workClass.x, workClass.y, workClass.width, workClass.height);
+				preLabel.setBorder(LineBorder.createBlackLineBorder());
+				preLabel.setPreferredSize(new Dimension(workClass.width, workClass.height));
+				preLabel.setBackground(new Color(workClass.color[0],workClass.color[1],workClass.color[2]));
+				preLabel.setForeground(new Color(255-preLabel.getBackground().getRed(), 255-preLabel.getBackground().getGreen(), 255-preLabel.getBackground().getBlue()));
+				preLabel.setFont(nodeFont);
+				preLabel.setHorizontalAlignment(SwingConstants.CENTER);
+				preLabel.addMouseMotionListener(new NodeDrag());
+				preLabel.addMouseListener(new NodeDrag());
+				MapPanel.add(preLabel);
+				MapPanel.repaint();
+				storage.insertNode(rootNode, preNode);
+			}
+			if(workClass.depth>_depth) {
+				list = insertNode(list,preNode,_depth+1);
+			}
+			if(workClass.depth<_depth){
+				return list;
+			}
+		}
 	}
 	
+	ArrayList<Saveform> OpenNodeFile(File f) {
+		ArrayList<Saveform> returnData = new ArrayList<>();
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(f));
+			String line = "";
+			while((line = br.readLine())!=null) {
+				Saveform tmp = new Gson().fromJson(line, Saveform.class);
+				returnData.add(tmp);
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return returnData;
+	}
+	
+	
+
 	Point[] getSPoint(JLabel de) {
 		Point[] returnData = new Point[4];
 		returnData[0] = new Point(de.getX() + de.getWidth()/2,de.getY());

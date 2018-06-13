@@ -395,6 +395,7 @@ class Window extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			JFileChooser jfc = new JFileChooser();
+
 			int result = jfc.showSaveDialog(myPane);
 			if(result == JFileChooser.APPROVE_OPTION) {
 				pointFile = jfc.getSelectedFile();
@@ -491,60 +492,15 @@ class Window extends JFrame {
 
 		 @Override
 	        public void mouseDragged(MouseEvent e) { 
-         	updateInformation(e);
-         	if(dragLocation.getX()>e.getComponent().getWidth()-20 && dragLocation.getY()<20) {
-         		int width = (int) (e.getComponent().getWidth() - (dragLocation.getX() - e.getX()));
-            	int height =(int) (e.getComponent().getHeight() + (dragLocation.getY() - e.getY()));
-            	int movedPointX = (int) (e.getComponent().getX());
-    			int movedPointY = (int) (e.getComponent().getY() - (dragLocation.getY() - e.getY()));
-    			if(width<100) width = 100;
-            	if(height<50) height = 50;
-            	
-            	e.getComponent().setBounds(movedPointX, movedPointY, width, height);
-    	
-    			dragLocation = e.getPoint();
-         	}
-         	
-         	else if(dragLocation.getX()<20 && dragLocation.getY() > e.getComponent().getHeight()-20) {
-         		int width = (int) (e.getComponent().getWidth() + (dragLocation.getX() - e.getX()));
-            	int height =(int) (e.getComponent().getHeight() - (dragLocation.getY() - e.getY()));
-            	int movedPointX = (int) (e.getComponent().getX() - (dragLocation.getX() - e.getX()));
-    			int movedPointY = (int) (e.getComponent().getY());
-    			if(width<100) width = 100;
-            	if(height<50) height = 50;
-            	
-            	e.getComponent().setBounds(movedPointX, movedPointY, width, height);
-    	
-    			dragLocation = e.getPoint();
-         	}
-         	else if (dragLocation.getX()>e.getComponent().getWidth()-20 || dragLocation.getY() > e.getComponent().getHeight() -20) {
-	                	//dragLocation.getX()>(labelPointer.getWidth()-10) && dragLocation.getY()>(labelPointer.getHeight()-10)
-	                	int width = (int) (e.getComponent().getWidth() + (e.getX() - dragLocation.getX()));
-	                	int height =(int) (e.getComponent().getHeight() + (e.getY() - dragLocation.getY()));
-	                	if(width<100) width = 100;
-	                	if(height<50) height = 50;
-	                	
-	                	e.getComponent().setSize(width,height);
-	                	dragLocation = e.getPoint();
-	                }
-	                else if(dragLocation.getX() < 20 || dragLocation.getY() < 20) {
-	                	int width = (int) (e.getComponent().getWidth() + (dragLocation.getX() - e.getX()));
-	                	int height =(int) (e.getComponent().getHeight() + (dragLocation.getY() - e.getY()));
-	                	int movedPointX = (int) (e.getComponent().getX() - (dragLocation.getX() - e.getX()));
-	        			int movedPointY = (int) (e.getComponent().getY() - (dragLocation.getY() - e.getY()));
-	        			if(width<100) width = 100;
-	                	if(height<50) height = 50;
-	                	
-	                	e.getComponent().setBounds(movedPointX, movedPointY, width, height);
-	        	
-	        			dragLocation = e.getPoint();
-	      
-	                }
-	                 else {
-	        			int movedPointX = (int) (e.getComponent().getX() + (e.getX() - dragLocation.getX()));
-	        			int movedPointY = (int) (e.getComponent().getY() + (e.getY() - dragLocation.getY()));
-	        			e.getComponent().setLocation(movedPointX,movedPointY);
-	               }
+         	       updateInformation(e);
+         	       
+	                if((dragLocation.getX()<e.getComponent().getWidth()-20&&dragLocation.getX()>20)&&(dragLocation.getY() < e.getComponent().getHeight()-20&&dragLocation.getY()>20)) {
+		        		int movedPointX = (int) (e.getComponent().getX() + (e.getX() - dragLocation.getX()));
+		        		int movedPointY = (int) (e.getComponent().getY() + (e.getY() - dragLocation.getY()));
+		        		e.getComponent().setLocation(movedPointX,movedPointY);
+		        		
+		        }
+		        
 		}
 
 		@Override
@@ -555,18 +511,15 @@ class Window extends JFrame {
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			updateInformation(e);
+			DrawNodeLine(MapPanel.getGraphics(),storage.rootNode.getNext(0));
 		}
 
 		@Override
 		public void mouseEntered(MouseEvent e) {
-			// TODO Auto-generated method stub
-			
 		}
 
 		@Override
 		public void mouseExited(MouseEvent e) {
-			
-			
 		}
 
 		@Override
@@ -578,8 +531,47 @@ class Window extends JFrame {
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
-
-			DrawNodeLine(MapPanel.getGraphics(),storage.rootNode.getNext(0));
+			if(dragLocation.getX()>e.getComponent().getWidth()-20 && dragLocation.getY()<20) {
+         		int width =e.getX();
+             	int height =e.getComponent().getHeight() - e.getY();
+            	int movedPointX = e.getComponent().getX();
+    			int movedPointY = e.getComponent().getY() + e.getY();
+    			if(width<100) width = 100;
+            	if(height<50) height = 50;
+            	
+            	e.getComponent().setBounds(movedPointX, movedPointY, width, height);
+         	}
+         	
+         	else if(dragLocation.getX()<20 && dragLocation.getY() > e.getComponent().getHeight()-20) {
+         		int width =e.getComponent().getWidth() - e.getX();
+             	int height =e.getY();
+            	int movedPointX = e.getComponent().getX() + e.getX();
+            	int movedPointY = e.getComponent().getY();
+    			if(width<100) width = 100;
+            	if(height<50) height = 50;
+            	
+            	e.getComponent().setBounds(movedPointX, movedPointY, width, height);
+         	}
+         	else if (dragLocation.getX()>e.getComponent().getWidth()-20 || dragLocation.getY() > e.getComponent().getHeight() -20) {
+         		int width =e.getX();
+             	int height =e.getY();
+            	int movedPointX = e.getComponent().getX();
+            	int movedPointY = e.getComponent().getY();
+    			if(width<100) width = 100;
+            	if(height<50) height = 50;
+            	
+            	e.getComponent().setBounds(movedPointX, movedPointY, width, height);
+	       }
+         	else if(dragLocation.getX() < 20 || dragLocation.getY() < 20) {
+         		int width =e.getComponent().getWidth() -e.getX();
+             	int height =e.getComponent().getHeight() - e.getY();
+            	int movedPointX = e.getComponent().getX() + e.getX();
+    			int movedPointY = e.getComponent().getY() + e.getY();
+    			if(width<100) width = 100;
+            	if(height<50) height = 50;
+            	
+            	e.getComponent().setBounds(movedPointX, movedPointY, width, height);
+         	}
 		}
 		
 	};

@@ -37,7 +37,7 @@ class Window extends JFrame {
 	
 	JTextArea TextArea; //Text Editor Pane 요소들
 	
-	MyMindPanel MapPanel; //Mind Map Pane 요소들
+	JPanel MapPanel; //Mind Map Pane 요소들
 	JButton apply;
 	
 	JPanel Attribute;
@@ -63,6 +63,7 @@ class Window extends JFrame {
 	Point dragLocation = new Point();
 	
 	File pointFile = null; //현재 저장되고있는 파일
+	JLabel preSelectionNode = null;
 
 	
 	public Window() {
@@ -99,7 +100,9 @@ class Window extends JFrame {
 		menuSave.addActionListener(new SaveListener());
 		menuSaveName.addActionListener(new OtherSaveListener());
 		menuApply.addActionListener(new ApplyListener());
+		menuApply.addMouseMotionListener(new UpdateNodeLine());
 		menuChange.addActionListener(new ChangeListener());
+		menuChange.addMouseMotionListener(new UpdateNodeLine());
 		menuClose.addActionListener(new CloseListener());
 		
 	
@@ -127,7 +130,9 @@ class Window extends JFrame {
 		toolSave.addActionListener(new SaveListener());
 		toolSaveName.addActionListener(new OtherSaveListener());
 		toolApply.addActionListener(new ApplyListener());
+		toolApply.addMouseMotionListener(new UpdateNodeLine());
 		toolChange.addActionListener(new ChangeListener());
+		toolChange.addMouseMotionListener(new UpdateNodeLine());
 		toolClose.addActionListener(new CloseListener());
 
 		
@@ -147,7 +152,7 @@ class Window extends JFrame {
 		TextArea.setTabSize(4);
 		JScrollPane TextPane = new JScrollPane(TextArea);
 		TextArea.setFont(nodeFont);
-		MapPanel = new MyMindPanel(); //마인드맵이 출력되는 곳
+		MapPanel = new JPanel(); //마인드맵이 출력되는 곳
 		MapPanel.setLayout(null);
 		
 		JScrollPane MapPane = new JScrollPane(MapPanel);
@@ -167,6 +172,7 @@ class Window extends JFrame {
 		LeftPane.add(textEditorLabel, BorderLayout.NORTH);
 		LeftPane.add(TextPane, BorderLayout.CENTER);
 		apply = new JButton("적용");
+		apply.addMouseMotionListener(new UpdateNodeLine());
 		LeftPane.add(apply, BorderLayout.SOUTH);
 
 		BasePane2.setLeftComponent(CenterPane); // MindMap, Attribute Pane 배치
@@ -222,38 +228,13 @@ class Window extends JFrame {
 		Attribute.add(colorBox);
 		change = new JButton("변경");
 		change.addActionListener(new ChangeListener());
+		change.addMouseMotionListener(new UpdateNodeLine());
 		RightPane.add(change, BorderLayout.SOUTH);
 		apply.addActionListener(new ApplyListener());
 
 	}
 	
-	class MyMindPanel extends JPanel{
-		@Override
-		public void updateUI() {
-			super.updateUI();
-			if(storage.rootNode.getNextNumber()!=0)
-			DrawNodeLine(this.getGraphics(),storage.rootNode.getNext(0));
-		}
-		@Override
-		public void paint(Graphics g) {
-			super.paint(g);
-			if(storage.rootNode.getNextNumber()!=0)
-			DrawNodeLine(this.getGraphics(),storage.rootNode.getNext(0));
-		}
-		@Override
-		public void update(Graphics g) {
-			super.update(g);
-			if(storage.rootNode.getNextNumber()!=0)
-				DrawNodeLine(this.getGraphics(),storage.rootNode.getNext(0));
-		}
-		
-		@Override
-		public void repaint() {
-			super.repaint();
-			if(storage.rootNode.getNextNumber()!=0)
-				DrawNodeLine(this.getGraphics(),storage.rootNode.getNext(0));
-		}
-	}
+
 	
 	class NewFileListener implements ActionListener{	//새로 만들기 리스너
 		
@@ -304,6 +285,10 @@ class Window extends JFrame {
 		
 		@Override
 		public void mouseClicked(MouseEvent arg) {
+			if(preSelectionNode!=null) {
+				preSelectionNode.setBackground(new Color(255-preSelectionNode.getBackground().getRed(), 255-preSelectionNode.getBackground().getGreen(), 255-preSelectionNode.getBackground().getBlue()));
+				preSelectionNode = null;
+			}
 			if(labelPointer != null)
 				labelPointer.setBorder(LineBorder.createBlackLineBorder());
 			labelPointer = null;
@@ -315,16 +300,25 @@ class Window extends JFrame {
 			colorBox.setText("");
 			colorBox.setBackground(Color.WHITE);
 		}
+		
+	
 	}
 	
 
 	
 	void updateInformation(MouseEvent arg) {
+		if(preSelectionNode!=null)
+			preSelectionNode.setBackground(new Color(255-preSelectionNode.getBackground().getRed(), 255-preSelectionNode.getBackground().getGreen(), 255-preSelectionNode.getBackground().getBlue()));
+		
 		JLabel l = (JLabel)arg.getSource();
-		if(labelPointer != null)
+		if(labelPointer != null) {
 			labelPointer.setBorder(LineBorder.createBlackLineBorder());
+		}
+		
 		labelPointer = l;
+		preSelectionNode = l;
 		l.setBorder(new LineBorder(Color.BLACK, 5));
+		l.setBackground(new Color(255-l.getBackground().getRed(), 255-l.getBackground().getGreen(), 255-l.getBackground().getBlue()));
 		textBox.setText(l.getText());
 		xBox.setText(String.valueOf(l.getX()));
 		yBox.setText(String.valueOf(l.getY()));
@@ -580,6 +574,9 @@ class Window extends JFrame {
             	
             	e.getComponent().setBounds(movedPointX, movedPointY, width, height);
          	}
+
+
+			DrawNodeLine(MapPanel.getGraphics(),storage.rootNode.getNext(0));
 		}
 		
 	};
@@ -593,7 +590,6 @@ class Window extends JFrame {
 			storage.rootNode.deleteNext(0);
 		}
 		insertNode(text,storage.rootNode,0);
-		MapPanel.updateUI();
 		if(storage.rootNode.getNextNumber()==0) {
 			return;
 		}
@@ -641,7 +637,6 @@ class Window extends JFrame {
 				preLabel.setBorder(LineBorder.createBlackLineBorder());
 				preLabel.setPreferredSize(new Dimension(100, 50));
 				preLabel.setBackground(setColor(depth));
-				preLabel.setForeground(new Color(255-preLabel.getBackground().getRed(), 255-preLabel.getBackground().getGreen(), 255-preLabel.getBackground().getBlue()));
 				preLabel.setFont(nodeFont);
 				preLabel.setHorizontalAlignment(SwingConstants.CENTER);
 				preLabel.addMouseMotionListener(new NodeDrag());
@@ -657,6 +652,24 @@ class Window extends JFrame {
 				return stringData;
 			}
 		}
+	}
+	
+	class UpdateNodeLine implements MouseMotionListener{
+
+		@Override
+		public void mouseDragged(MouseEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void mouseMoved(MouseEvent arg0) {
+			if(storage.rootNode.getNextNumber()!=0)
+				DrawNodeLine(MapPanel.getGraphics(),storage.rootNode.getNext(0));
+		}
+
+		
+		
 	}
 
 	private Color setColor(int num) {
@@ -759,7 +772,6 @@ class Window extends JFrame {
 				preLabel.setBorder(LineBorder.createBlackLineBorder());
 				preLabel.setPreferredSize(new Dimension(workClass.width, workClass.height));
 				preLabel.setBackground(new Color(workClass.color[0],workClass.color[1],workClass.color[2]));
-				preLabel.setForeground(new Color(255-preLabel.getBackground().getRed(), 255-preLabel.getBackground().getGreen(), 255-preLabel.getBackground().getBlue()));
 				preLabel.setFont(nodeFont);
 				preLabel.setHorizontalAlignment(SwingConstants.CENTER);
 				preLabel.addMouseMotionListener(new NodeDrag());

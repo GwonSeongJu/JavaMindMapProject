@@ -42,6 +42,8 @@ class Window extends JFrame {
 	Font labelFont = new Font("Arial", Font.BOLD, 30); //Pane 이름에 적용된 폰트
 	Font nodeFont = new Font("굴림", Font.PLAIN, 20); //node에 적용될 폰트
 	
+	boolean isNewFile = false;
+	
 	JavaTree<JLabel> storage;	//node저장소
 	JLabel labelPointer = null; //클릭한 노드를 저장하는 포인터
 	JLabel pointW;
@@ -78,6 +80,7 @@ class Window extends JFrame {
 		menu.add(menuApply);
 		menu.add(menuChange);
 		menu.add(menuClose);
+		menuNewFile.addActionListener(new NewFileListener());
 		menuApply.addActionListener(new ApplyListener());
 		menuChange.addActionListener(new ChangeListener());
 		menuClose.addActionListener(new CloseListener());
@@ -102,6 +105,7 @@ class Window extends JFrame {
 		tool.add(toolApply);
 		tool.add(toolChange);
 		tool.add(toolClose);
+		toolNewFile.addActionListener(new NewFileListener());
 		toolApply.addActionListener(new ApplyListener());
 		toolChange.addActionListener(new ChangeListener());
 		toolClose.addActionListener(new CloseListener());
@@ -200,6 +204,25 @@ class Window extends JFrame {
 		RightPane.add(change, BorderLayout.SOUTH);
 		apply.addActionListener(new ApplyListener());
 
+	}
+	
+	class NewFileListener implements ActionListener{	//새로 만들기 리스너
+		
+		@Override
+		public void actionPerformed(ActionEvent arg) {
+		TextArea.setText("");
+		isNewFile = true;
+		Apply();
+		isNewFile = false;
+		labelPointer = null;
+		textBox.setText("");
+		xBox.setText("");
+		yBox.setText("");
+		hBox.setText("");
+		wBox.setText("");
+		colorBox.setText("");
+		colorBox.setBackground(Color.WHITE);
+		}
 	}
 	
 	class CloseListener implements ActionListener{	//닫기 리스너
@@ -344,94 +367,12 @@ class Window extends JFrame {
 		@SuppressWarnings("deprecation")
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			MapPanel.setPreferredSize(new Dimension(MapPanel.getWidth(),MapPanel.getHeight()));
-			String text = TextArea.getText();
-			text = text + "\n\n";
-			if(MapPanel.countComponents()>0) {
-				MapPanel.removeAll();
-				storage.rootNode.deleteNext(0);
-			}
-			insertNode(text,storage.rootNode,0);
-			
-			while(!setNodePosition(storage.rootNode.getNext(0))) {
-				
-				double DimX = MapPanel.getPreferredSize().getWidth()*2;
-				double DimY = MapPanel.getPreferredSize().getHeight()*2;
-				Dimension tmp = new Dimension();
-				tmp.setSize(DimX, DimY);
-				MapPanel.setPreferredSize(tmp);
-				MapPanel.setSize(tmp);
-				storage.rootNode.getNext(0).getData().setLocation(MapPanel.getWidth()/2,MapPanel.getHeight()/2);
-			}
-			
-			DrawNodeLine(MapPanel.getGraphics(),storage.rootNode.getNext(0));
-			
-		}
-		
-		private String insertNode(String stringData, Node<JLabel> rootNode, int depth) {
-			Node<JLabel> preNode = null;
-			
-			while(true) {
-				int tapCount = 0;
-				if(stringData.charAt(0)=='\n') {
-					return stringData;
-				}
-				for(int i=0;stringData.charAt(i)=='\t';i++) {
-					tapCount++;
-				}
-				if(tapCount==depth) {
-					stringData = stringData.substring(tapCount);
-					JLabel preLabel = new JLabel(stringData.substring(0, stringData.indexOf('\n')));
-					stringData = stringData.substring(stringData.indexOf('\n')+1);
-					preNode = new Node<>();
-					preNode.setData(preLabel);
-					preLabel.setOpaque(true);
-	
-					
-					if(depth==0) {
-						preLabel.setBounds(MapPanel.getWidth()/2-50, MapPanel.getHeight()/2-25, 100, 50);
-					}
-					else {
-						preLabel.setBounds(10,10,100,50);
-					}
-					preLabel.setBorder(LineBorder.createBlackLineBorder());
-					preLabel.setPreferredSize(new Dimension(100, 50));
-					preLabel.setBackground(setColor(depth));
-					preLabel.setForeground(new Color(255-preLabel.getBackground().getRed(), 255-preLabel.getBackground().getGreen(), 255-preLabel.getBackground().getBlue()));
-					preLabel.setFont(nodeFont);
-					preLabel.setHorizontalAlignment(SwingConstants.CENTER);
-					preLabel.addMouseMotionListener(new NodeDrag());
-					preLabel.addMouseListener(new NodeDrag());
-					MapPanel.add(preLabel);
-					MapPanel.repaint();
-					storage.insertNode(rootNode, preNode);
-				}
-				if(tapCount>depth) {
-					stringData = insertNode(stringData,preNode,depth+1);
-				}
-				if(tapCount<depth){
-					return stringData;
-				}
-			}
-		}
-		
-		private Color setColor(int num) {
-			if(num>8)
-				return new Color(255, 255, 255);
-			else if (num%3==0)
-				return new Color(255, 150+(50*num/3), 150+(50*num/3));
-			else if (num%3==1)
-				return new Color(150+(50*num/3), 255, 150+(50*num/3));
-			else
-				return new Color(150+(50*num/3), 150+(50*num/3), 255);
-		}
+			Apply();
+		}		
 	}
 	
 	class NodeDrag implements MouseMotionListener, MouseListener{	//노드 마우스 드래그 리스너
 
-		
-		
-		
 		 @Override
 	        public void mouseDragged(MouseEvent e) { 
          	updateInformation(e);
@@ -468,9 +409,8 @@ class Window extends JFrame {
 		}
 
 		@Override
-		public void mouseClicked(MouseEvent arg0) {
-			// TODO Auto-generated method stub
-			
+		public void mouseClicked(MouseEvent e) {
+			updateInformation(e);
 		}
 
 		@Override
@@ -499,6 +439,90 @@ class Window extends JFrame {
 		}
 		
 	};
+	
+	void Apply() {
+		MapPanel.setPreferredSize(new Dimension(MapPanel.getWidth(),MapPanel.getHeight()));
+		String text = TextArea.getText();
+		text = text + "\n\n";
+		if(MapPanel.countComponents()>0) {
+			MapPanel.removeAll();
+			storage.rootNode.deleteNext(0);
+		}
+		insertNode(text,storage.rootNode,0);
+		MapPanel.updateUI();
+		
+		if(isNewFile == false) {
+			while(!setNodePosition(storage.rootNode.getNext(0))) {
+			
+				double DimX = MapPanel.getPreferredSize().getWidth() + 100;
+				double DimY = MapPanel.getPreferredSize().getHeight() + 100;
+				Dimension tmp = new Dimension();
+				tmp.setSize(DimX, DimY);
+				MapPanel.setPreferredSize(tmp);
+				MapPanel.setSize(tmp);
+				storage.rootNode.getNext(0).getData().setLocation(MapPanel.getWidth()/2,MapPanel.getHeight()/2);
+			}
+		
+			DrawNodeLine(MapPanel.getGraphics(),storage.rootNode.getNext(0));
+		}
+	}
+	
+	private String insertNode(String stringData, Node<JLabel> rootNode, int depth) {
+		Node<JLabel> preNode = null;
+		
+		while(true) {
+			int tapCount = 0;
+			if(stringData.charAt(0)=='\n') {
+				return stringData;
+			}
+			for(int i=0;stringData.charAt(i)=='\t';i++) {
+				tapCount++;
+			}
+			if(tapCount==depth) {
+				stringData = stringData.substring(tapCount);
+				JLabel preLabel = new JLabel(stringData.substring(0, stringData.indexOf('\n')));
+				stringData = stringData.substring(stringData.indexOf('\n')+1);
+				preNode = new Node<>();
+				preNode.setData(preLabel);
+				preLabel.setOpaque(true);
+					
+				if(depth==0) {
+					preLabel.setBounds(MapPanel.getWidth()/2-50, MapPanel.getHeight()/2-25, 100, 50);
+				}
+				else {
+					preLabel.setBounds(10,10,100,50);
+				}
+				preLabel.setBorder(LineBorder.createBlackLineBorder());
+				preLabel.setPreferredSize(new Dimension(100, 50));
+				preLabel.setBackground(setColor(depth));
+				preLabel.setForeground(new Color(255-preLabel.getBackground().getRed(), 255-preLabel.getBackground().getGreen(), 255-preLabel.getBackground().getBlue()));
+				preLabel.setFont(nodeFont);
+				preLabel.setHorizontalAlignment(SwingConstants.CENTER);
+				preLabel.addMouseMotionListener(new NodeDrag());
+				preLabel.addMouseListener(new NodeDrag());
+				MapPanel.add(preLabel);
+				MapPanel.repaint();
+				storage.insertNode(rootNode, preNode);
+			}
+			if(tapCount>depth) {
+				stringData = insertNode(stringData,preNode,depth+1);
+			}
+			if(tapCount<depth){
+				return stringData;
+			}
+		}
+	}
+
+	private Color setColor(int num) {
+		if(num>8)
+			return new Color(255, 255, 255);
+		else if (num%3==0)
+			return new Color(255, 150+(50*num/3), 150+(50*num/3));
+		else if (num%3==1)
+			return new Color(150+(50*num/3), 255, 150+(50*num/3));
+		else
+			return new Color(150+(50*num/3), 150+(50*num/3), 255);
+	}
 	
 	void DrawNodeLine(Graphics g,Node<JLabel> root) {
 		if(root.getNextNumber()==0)

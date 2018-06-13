@@ -262,6 +262,43 @@ class Window extends JFrame {
 		//System.out.println(arg.getComponent().getLocation());
 	}
 	
+	void setNodePosition(Node<JLabel> root) {
+		if(root.getNextNumber()==0)
+			return;
+		Point rootP = root.getData().getLocation();
+		rootP.setLocation(rootP.getX() + root.getData().getWidth()/2, rootP.getY() + root.getData().getHeight()/2);
+		
+		double rec = 360/root.getNextNumber();
+		for(int i=0,j=0; i<360;i+=rec,j++) {
+			root.getNext(j).getData().setLocation((int)(rootP.getX()+(rootP.getX() / 2)*Math.cos(Math.toRadians(i))) - root.getNext(j).getData().getWidth()/2, (int)(rootP.getY() + (rootP.getY()/2)*Math.sin(Math.toRadians(i)) - root.getNext(j).getData().getHeight()/2));
+			if (root.getNext(j).getNextNumber()!=0) {
+				Point tmp = new Point();
+				tmp.setLocation(rootP.getX()/2, rootP.getY()/2);
+				setNodePosition(root.getNext(j),tmp);
+			}
+			
+		}
+	}
+	
+	void setNodePosition(Node<JLabel> root, Point lengh) {
+		if(root.getNextNumber()==0)
+			return;
+		Point rootP = root.getData().getLocation();
+		rootP.setLocation(rootP.getX() + root.getData().getWidth()/2, rootP.getY() + root.getData().getHeight()/2);
+		
+		double rec = 360/root.getNextNumber();
+		for(int i=0,j=0; i<360;i+=rec,j++) {
+			root.getNext(j).getData().setLocation((int)(rootP.getX()+(lengh.getX() / 2)*Math.cos(Math.toRadians(i))) - root.getNext(j).getData().getWidth()/2, (int)(rootP.getY() + (lengh.getY()/2)*Math.sin(Math.toRadians(i)) - root.getNext(j).getData().getHeight()/2));
+			if (root.getNext(j).getNextNumber()!=0) {
+				Point tmp = new Point();
+				tmp.setLocation(lengh.getX()/2, lengh.getY()/2);
+				setNodePosition(root.getNext(j),tmp);
+			}
+			
+		}
+	}
+	
+	
 	class ChangeListener implements ActionListener{	//변경 리스너
 		
 		@Override
@@ -282,8 +319,10 @@ class Window extends JFrame {
 			String text = TextArea.getText();
 			text = text + "\n\n";
 			insertNode(text,storage.rootNode,0);
-
+			setNodePosition(storage.rootNode.getNext(0));	
 			MapPanel.updateUI();
+			
+			DrawNodeLine(MapPanel.getGraphics(),storage.rootNode.getNext(0));
 			
 		}
 		
@@ -308,7 +347,7 @@ class Window extends JFrame {
 	
 					
 					if(depth==0) {
-						preLabel.setBounds(MapPanel.getWidth()/2, MapPanel.getHeight()/2, 100, 50);
+						preLabel.setBounds(MapPanel.getWidth()/2-50, MapPanel.getHeight()/2-25, 100, 50);
 					}
 					else {
 						preLabel.setBounds(10,10,100,50);

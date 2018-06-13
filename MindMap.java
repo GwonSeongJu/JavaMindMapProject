@@ -116,8 +116,10 @@ class Window extends JFrame {
 		tool.add(toolClose);
 		toolNewFile.addActionListener(new NewFileListener());
 		toolOpen.addActionListener(new OpenListener());
+		toolOpen.addMouseMotionListener(new UpdateLineListener());
 		toolSave.addActionListener(new SaveListener());
 		toolApply.addActionListener(new ApplyListener());
+		toolApply.addMouseMotionListener(new UpdateLineListener());
 		toolChange.addActionListener(new ChangeListener());
 		toolClose.addActionListener(new CloseListener());
 
@@ -242,6 +244,24 @@ class Window extends JFrame {
 		public void actionPerformed(ActionEvent arg) {
 			System.exit(0);
 		}
+	}
+	
+	class UpdateLineListener implements MouseMotionListener{
+
+		@Override
+		public void mouseDragged(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void mouseMoved(MouseEvent e) {
+			if(storage.rootNode.getNextNumber()>0)
+				DrawNodeLine(MapPanel.getGraphics(),storage.rootNode.getNext(0));
+		}
+
+	
+		
 	}
 	
 	class ColorListener extends MouseAdapter	{	//색깔 선택 리스너
@@ -538,6 +558,8 @@ class Window extends JFrame {
 	}
 	
 	private String insertNode(String stringData, Node<JLabel> rootNode, int depth) {
+		if(rootNode == null)
+			return null;
 		Node<JLabel> preNode = null;
 		
 		while(true) {

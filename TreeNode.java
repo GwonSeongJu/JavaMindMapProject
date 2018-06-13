@@ -26,6 +26,7 @@ class Node<T>{
 		next.remove(index);
 	}
 	
+	
 	public void deleteNode(Node<T> node){
 		next.remove(node);
 	}
